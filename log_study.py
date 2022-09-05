@@ -86,31 +86,32 @@ class TextManipulator:
 
         compteur = start_line
         buffer = []
+        status = 0
         for line_nb, line in enumerate(self.lines[compteur:]):
-
-            if string in line:
-                compteur += line_nb
-                print("Trouvé ", line)
-                # pdb.set_trace()
-                print("Renvoie  ", self.context(line_nb, before, after))
-                yield self.context(line_nb, before, after)
-
-
-        for line_nb, line in enumerate(self.lines):
             if status == 1:  # déjà trouvé :
                 if end_pattern not in line:
-                    buffer.append((line_nb, line))
+                    buffer.append((line_nb+compteur, line))
                 else:
-                    buffer.append((line_nb, line))
+                    buffer.append((line_nb+compteur, line))
                     status = 2
+                    compteur += line_nb
                     break
-            if status == 0:
+            elif status == 0:
                 if init_pattern in line:
-                    buffer.append((line_nb, line))
+                    buffer.append((line_nb+compteur, line))
                     status = 1
-        return buffer
 
+        yield self.context(line_nb, before, after)
 
+    def find_all_begin_block(self, init_pattern, end_pattern, start_line=0, before=0, after=0):
+        gene = self.generator_debut_fin(init_pattern=init_pattern, end_pattern=end_pattern, start_line=start_line, before=before, after=after)
+        buf = []
+        for block in gene:
+            if block:
+                buf.extend(mark_line_block(block))
+        print("*******************")
+        display_lines(buf)
+        print("*******************")
 
     def debut_fin_first(self, init_pattern, end_pattern):
         status = 0
@@ -143,11 +144,13 @@ AA = TextManipulator(i_file)
 
 display_lines(AA.debut_fin_first('/mips/glims8/tmp/mgrb9168', 'ort 10001'))
 
-AA.find_all("/mips/message", before=1, after=2)
+# AA.find_all("/mips/message", before=1, after=2)
 # input()
 #
 #
-AA.find_all("/mips/message", before=0, after=0)
+# AA.find_all("/mips/message", before=0, after=0)
+print("RRRRRRRRRRRRRRRRRRR")
+AA.find_all_begin_block(init_pattern="Task start:", end_pattern="Task end:")
 # In[199]:
 
 #
