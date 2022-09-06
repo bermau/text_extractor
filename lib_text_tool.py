@@ -46,7 +46,6 @@ unix end of line will be separated in a list of strings"""
         self.lines = string.split("\n")
 
     def print_info(self):
-
         print("Number of lines :  {}".format(len(self.lines)))
 
     def sup_regex(self, pattern):
