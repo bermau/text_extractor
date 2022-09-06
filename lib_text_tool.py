@@ -49,7 +49,7 @@ unix end of line will be separated in a list of strings"""
 
         print("Number of lines :  {}".format(len(self.lines)))
 
-    def supRegex(self, pattern):
+    def sup_regex(self, pattern):
         """Supprime les lignes contenant une RegEx.
 
 - modifie self.lignes"""
@@ -63,13 +63,13 @@ unix end of line will be separated in a list of strings"""
         avecPat = [line for line in self.lines if p.match(line)]
         self.lines = avecPat
 
-    def supRegexSkiping(self, pattern, skip=0):
+    def sup_regex_skiping(self, pattern, skip=0):
         p = re.compile(pattern)
         sansPat = [line for line in self.lines[skip:] if not p.match(line)]
         self.lines = self.lines[0:skip]
         self.lines.extend(sansPat)
 
-    def remplacerRegex(self, pattern, repl, skip=0):
+    def replace_regex(self, pattern, repl, skip=0):
         """Remplace un motif par un autre"""
         p = re.compile(pattern)
         without_pattern = [p.sub(repl, line) for line in self.lines[skip:]]
@@ -92,13 +92,13 @@ unix end of line will be separated in a list of strings"""
         avecPat = [line for line in self.lines[skip:] if p.match(line)]
         return avecPat
 
-    def supp_empty_lines(self):
+    def remove_empty_lines(self):
         # print(mapage)
         without_empty_lines = [line for line in self.lines if line != '\n']
         self.lines = without_empty_lines
 
-    def suppRetourLignes(self):
-        """Atention a éventuel effet de bord"""
+    def remove_carriage_return(self):
+        """Attention à éventuel effet de bord"""
         self.lines = [self.lines[i].replace('\n', '') for i in range(len(self.lines))]
 
     def suppFF(self):
@@ -259,12 +259,12 @@ permet de vérifier le type de séparateur utilisé"""
 if __name__ == '__main__':
     net = TextManipulator()
     net.read_file(filename="./data_in/very_short.log", encoding="latin1")
-    net.suppRetourLignes()
+    net.remove_carriage_return()
     net.cat_lines()
-    net.supp_empty_lines()
+    net.remove_empty_lines()
     # net.supRegexSkiping(".*scheduler", skip=0)
-    net.supRegexSkiping("12625")
-    net.supRegex(r".*private.*|.*CR.*")
+    net.sup_regex_skiping("12625")
+    net.sup_regex(r".*private.*|.*CR.*")
     net.print_info()
     net.cat_lines()
     # net.remplacerRegex(r';{2,}',r';') # remplacer les suites de plus de 2 ; par un seul.^^

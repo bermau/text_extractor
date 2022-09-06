@@ -1,5 +1,5 @@
 # Fichier pour la mise au point.
-import log_study
+import lib_log_study
 
 i_file = r"./data_in/very_short.log"
 

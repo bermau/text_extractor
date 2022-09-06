@@ -1,6 +1,6 @@
 # this file contains tests to validate my librairy
 
-from log_study import *
+from lib_log_study import *
 
 i_file = r"./data_in/glimscron4_20220830_221610.log"
 
