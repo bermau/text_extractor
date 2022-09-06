@@ -36,6 +36,13 @@ class NumberedLine:
     num: int
     text: str
 
+class NumberedText:
+    def __init__(self, a_list_of_numbered_line):
+        self.data = a_list_of_numbered_line
+    def display(self):
+        for line in data:
+            print(data.int, data.text)
+
 class TextManipulator:
 
     lines = [] # list of strings
@@ -107,8 +114,8 @@ class TextManipulator:
 
     def remove_carriage_return(self):
         """Attention à éventuel effet de bord"""
-        tempo = [line.text = line.text.replace('\n', '')) for line in self.n_lines ]
-        self.n_lines = tempo
+        for line in self.n_lines:
+            line.text = line.text.replace('\n', '')
 
     def suppFF(self):
         """supprime les caractères FF (hexadécimal 0C). Attention python attent 0C et retourne avec un 0c en minuscule.
@@ -177,18 +184,17 @@ permet de vérifier le type de séparateur utilisé"""
         return [(line_nb, line) for line_nb, line in enumerate(self.lines) if string in line]
 
     def first_ocurence(self, string):
-        for line_nb, line in self.n_lines:
-            if string in line:
-                return [(line_nb, line)]
+        for line in self.n_lines:
+            if string in line.text:
+                return [line]
 
     def first_ocurence_with_contexte(self, string, start_line=0, before=0, after=0, inplace = True):
-        for line_nb, n_line in enumerate(self.n_lines[start_line:]):
-            if string in n_line[1]:
+        for line in self.n_lines[start_line:]:
+            if string in line.text:
                 if inplace:
                     self.n_lines = self.context(line_nb + start_line, before, after)
                 else:
                     return self.context(line_nb + start_line, before, after)
-
 
     def generator_for_ocurence_with_contexte(self, string, start_line=0, before=0, after=0):
 
