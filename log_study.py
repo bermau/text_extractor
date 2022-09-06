@@ -68,7 +68,6 @@ class TextManipulator:
             if string in line:
                 compteur += line_nb
                 print("Trouvé ", line)
-                # pdb.set_trace()
                 print("Renvoie  ", self.context(line_nb, before, after))
                 yield self.context(line_nb, before, after)
 
@@ -96,15 +95,17 @@ class TextManipulator:
                     status = 2
                     compteur += line_nb
                     break
+
             elif status == 0:
                 if init_pattern in line:
                     buffer.append((line_nb+compteur, line))
                     status = 1
 
-        yield self.context(line_nb, before, after)
+        yield buffer
 
-    def find_all_begin_block(self, init_pattern, end_pattern, start_line=0, before=0, after=0):
-        gene = self.generator_debut_fin(init_pattern=init_pattern, end_pattern=end_pattern, start_line=start_line, before=before, after=after)
+    def find_all_begin_end_block(self, init_pattern, end_pattern, start_line=0, before=0, after=0):
+        gene = self.generator_debut_fin(init_pattern=init_pattern, end_pattern=end_pattern,
+                                        start_line=start_line, before=before, after=after)
         buf = []
         for block in gene:
             if block:
@@ -142,7 +143,7 @@ class TextManipulator:
 
 AA = TextManipulator(i_file)
 
-display_lines(AA.debut_fin_first('/mips/glims8/tmp/mgrb9168', 'ort 10001'))
+# display_lines(AA.debut_fin_first('/mips/glims8/tmp/mgrb9168', 'ort 10001'))
 
 # AA.find_all("/mips/message", before=1, after=2)
 # input()
@@ -150,7 +151,7 @@ display_lines(AA.debut_fin_first('/mips/glims8/tmp/mgrb9168', 'ort 10001'))
 #
 # AA.find_all("/mips/message", before=0, after=0)
 print("RRRRRRRRRRRRRRRRRRR")
-AA.find_all_begin_block(init_pattern="Task start:", end_pattern="Task end:")
+AA.find_all_begin_end_block(init_pattern="Task start:", end_pattern="Task end:")
 # In[199]:
 
 #
