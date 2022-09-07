@@ -13,7 +13,7 @@ def new_line():
     print("*" * 30)
 
 class CalculsTest(unittest.TestCase):
-    """Cette classe contient les méthodes qui, si elles conmmencent par le mot
+    """Cette classe contient les méthodes qui, si elles commencent par le mot
 test, sont des tests unitaires."""
 
     @classmethod
