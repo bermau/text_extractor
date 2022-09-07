@@ -12,14 +12,15 @@ import re
 import pdb
 
 def display_lines(numbered_lines):
-    if len(numbered_lines) == 1:
-        print(numbered_lines[0][0], numbered_lines[0][1])
-    else:
-        for line in numbered_lines:
-            if isinstance(line, NumberedLine):
-                print(line.num, line.text)
-            else:
-                print(line[0], line[1], end='')
+    if numbered_lines:
+        if len(numbered_lines) == 1:
+            print(numbered_lines[0][0], numbered_lines[0][1])
+        else:
+            for line in numbered_lines:
+                if isinstance(line, NumberedLine):
+                    print(line.num, line.text)
+                else:
+                    print(line[0], line[1], end='')
 
 
 def mark_doubleline_block(numbered_lines):
@@ -90,7 +91,7 @@ class TextManipulator:
     def replace_regex(self, pattern, repl, skip=0):
         """Remplace un motif par un autre"""
         p = re.compile(pattern)
-        replaced_pattern = [p.sub(repl, line.text) for line in self.n_lines[skip:]]
+        replaced_pattern = [ NumberedLine(line.num, p.sub(repl, line.text)) for line in self.n_lines[skip:]]
         # possible que cela soit plus rapide que :
         # sansPat=[re.sub(pattern,repl,line) for line in self.lignes[skip:]]
         self.n_lines = replaced_pattern

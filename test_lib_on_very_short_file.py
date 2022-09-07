@@ -9,6 +9,9 @@ i_file = r"data_in/demo_log_10_fictive_lines.log"
 def greet(name):
     print('Hello ', name)
 
+def new_line():
+    print("*" * 30)
+
 class CalculsTest(unittest.TestCase):
     """Cette classe contient les méthodes qui, si elles conmmencent par le mot
 test, sont des tests unitaires."""
@@ -68,9 +71,6 @@ test, sont des tests unitaires."""
         self.assertTrue(self.AA.n_lines[-1].text.endswith("la ligne 6"))
         self.assertEqual(len(self.AA), 2)
 
-
-
-
     def test_seq(self):
         self.AA.remove_carriage_return()
         self.AA.head(3)
@@ -89,6 +89,16 @@ test, sont des tests unitaires."""
         self.AA.sup_regex(".*2020")
         self.AA.sup_regex('-----|Executing')
         self.assertEqual(len(self.AA), 9)
+
+    def test_replace_regex(self):
+        self.AA.remove_carriage_return()
+        self.AA.replace_regex("ceci", "cela")
+        self.AA.cat_lines()
+        new_line()
+        self.AA.sup_regex("cela")
+        self.AA.cat_lines()
+        self.assertEqual(self.AA.n_lines[-1].num, 9)
+
 
 def test_suite():
     """Retourne la liste des tests à traiter."""
