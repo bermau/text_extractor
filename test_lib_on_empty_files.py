@@ -27,10 +27,10 @@ test, sont des tests unitaires."""
     def test_remove_empty_lines(self):
         print("remove_empty_lines : intial fil contains 11 lines with 2 empty lines")
         self.AA.remove_carriage_return()
-        self.AA.cat_lines()
+        self.AA.cat()
         new_line()
         self.AA.remove_empty_lines()
-        self.AA.cat_lines()
+        self.AA.cat()
         self.assertEqual(len(self.AA), 9)
 
 
