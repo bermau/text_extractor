@@ -119,11 +119,13 @@ test, sont des tests unitaires."""
         self.assertEqual(len(self.AA), 6)
 
     def test_get_regex(self):
-        print("Test de get_regex")
+        print("Test de get_regex : Selectionner les ligne contenant fin")
         self.AA.remove_carriage_return()
         self.AA.cat_lines()
         new_line()
-        print(self.AA.get_regex(".*fin"))
+        selection_of_numberedlines = self.AA.get_regex(".*fin")
+        self.assertEqual(len(selection_of_numberedlines), 4)
+        self.assertEqual(selection_of_numberedlines[2].num, 7)
 
 
 def test_suite():
