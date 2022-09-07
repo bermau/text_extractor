@@ -16,7 +16,10 @@ def display_lines(numbered_lines):
         print(numbered_lines[0][0], numbered_lines[0][1])
     else:
         for line in numbered_lines:
-            print(line[0], line[1], end='')
+            if isinstance(line, NumberedLine):
+                print(line.num, line.text)
+            else:
+                print(line[0], line[1], end='')
 
 
 def mark_doubleline_block(numbered_lines):
@@ -51,7 +54,7 @@ class TextManipulator:
     def __init__(self, filename=r"../input/*.csv", encoding="utf8"):
         with open(filename, "r", encoding=encoding) as entree:
             self.lines = entree.readlines(LIMITE_CARACTERES_LUS)
-        self.n_lines = [NumberedLine(num, line) for num, line in enumerate(self.lines, start=1)]
+        self.n_lines = [NumberedLine(num, text) for num, text in enumerate(self.lines, start=1)]
         print("Number of initial lines :  {}".format(len(self.n_lines)))
 
     def loadString(self, string):
@@ -62,21 +65,13 @@ class TextManipulator:
     def print_info(self):
         print("Number of lines :  {}".format(len(self.n_lines)))
 
-
     def sup_regex(self, pattern):
         """Supprime les lignes contenant une RegEx.
 - modifie self.n_lines"""
-
+        # PROBABLEMENT OK
         p = re.compile(pattern)
-        without_pattern = [(num, line) for (num, line) in self.n_lines if not p.match(line)]
-        self.lines = without_pattern
-
-    def imposeRegex(self, pattern):
-        """Ne conserve que les lignes avec une RegEx."""
-        p = re.compile(pattern)
-        # avecPat = [line for line in self.lines if p.match(line)]
-        with_pattern = [(num, line) for (num, line) in self.n_lines if p.match(line)]
-        self.lines = with_pattern
+        without_pattern = [line for line in self.n_lines if not p.match(line.text)]
+        self.n_lines = without_pattern
 
     def sup_regex_skiping(self, pattern, skip=0):
         p = re.compile(pattern)
@@ -87,21 +82,21 @@ class TextManipulator:
     def replace_regex(self, pattern, repl, skip=0):
         """Remplace un motif par un autre"""
         p = re.compile(pattern)
-        without_pattern = [p.sub(repl, line) for line in self.lines[skip:]]
+        replaced_pattern = [p.sub(repl, line.text) for line in self.n_lines[skip:]]
         # possible que cela soit plus rapide que :
         # sansPat=[re.sub(pattern,repl,line) for line in self.lignes[skip:]]
+        self.n_lines = replaced_pattern
+        # self.lines.extend(without_pattern)
 
-        self.lines = self.lines[0:skip]
-        self.lines.extend(without_pattern)
-
-    def find_regex(self, pattern, skip=0):
-        """Affiche les lignes contenant une regex"""
+    def select_regex(self, pattern, skip=0):
+        """Ne conserve que les lignes avec une RegEx."""
         p = re.compile(pattern)
-        avecPat = [line for line in self.lines[skip:] if p.match(line)]
-        for line in avecPat:
-            print(line)
+        # avecPat = [line for line in self.lines if p.match(line)]
+        with_pattern = [line for line in self.n_lines[skip:] if p.match(line.text)]
+        self.n_lines = with_pattern
 
-    def getRegex(self, pattern, skip=0):
+
+    def get_regex(self, pattern, skip=0):
         """retourne les lignes contenant une regex"""
         p = re.compile(pattern)
         avecPat = [line for line in self.lines[skip:] if p.match(line)]
@@ -109,21 +104,20 @@ class TextManipulator:
 
     def remove_empty_lines(self):
         # print(mapage)
-        without_empty_lines = [line for line in self.lines if line != '\n']
-        self.lines = without_empty_lines
+        without_empty_lines = [line for line in self.n_lines if line.text != '\n']
+        self.n_lines = without_empty_lines
 
     def remove_carriage_return(self):
-        """Attention à éventuel effet de bord"""
         for line in self.n_lines:
             line.text = line.text.replace('\n', '')
 
     def suppFF(self):
         """supprime les caractères FF (hexadécimal 0C). Attention python attent 0C et retourne avec un 0c en minuscule.
         Dans le cas présent, il a des FF et des FF suivis de LF"""
-        sansFF = [line for line in self.lines if line not in ('\x0C\n', '\x0C')]
-        self.lines = sansFF
+        sansFF = [line for line in self.n_lines if line.text not in ('\x0C\n', '\x0C')]
+        self.n_lines = sansFF
 
-    def imposerMarques(self, ligne='', positions=[], longueur=0):
+    def get_imposer_marques(self, ligne='', positions=[], longueur=0):
         """renvoie la ligne 1 mise à la longueur et en remplaçant  les caractères situés à la liste de positions par un caractère |"""
         ligne = ligne.ljust(longueur)
         ligne_out = ''
@@ -139,15 +133,15 @@ class TextManipulator:
 """
         condition = r'^PCC.*'
         pat = re.compile(condition)
-        self.lignesOut = []
+        lignesOut = []
         titre = ''
-        for item in self.lines:
-            if pat.match(item):
+        for item in self.n_lines:
+            if pat.match(item.text):
                 # self.lignesOut.append(item)
-                titre = item + ';'
+                titre = item.text + ';'
             else:
-                self.lignesOut.append(titre + item)
-        self.lines = self.lignesOut
+                lignesOut.append(titre + item.text)
+        self.n_lines = lignesOut
 
     def formatEntete(self):
         """Insertion d'une entête expliquant les colonnes extraites"""
@@ -160,7 +154,7 @@ Type;Moyenne;SD;CV;Nb"""
     def cat_lines(self):
         # print(self.formatEntete())
         for line in self.n_lines:
-            print(line[0], line[1])
+            print(line.num, line.text)
 
     def writeFile(self, filename=r"./data_out/output.csv"):
         """Ecrit le résultat des lignes"""
@@ -168,7 +162,7 @@ Type;Moyenne;SD;CV;Nb"""
             # sortie.write(self.formatEntete())
             sortie.write("\n")
             for line in self.n_lines:
-                sortie.write(line[0], line[1] + "\n")
+                sortie.write(line.num, line.text + "\n")
 
     def writeFileForCSV(self, filename=r"../output/output.csv"):
         """Ecrit le résultat des lignes"""
@@ -188,13 +182,11 @@ permet de vérifier le type de séparateur utilisé"""
             if string in line.text:
                 return [line]
 
-    def first_ocurence_with_contexte(self, string, start_line=0, before=0, after=0, inplace = True):
-        for line in self.n_lines[start_line:]:
+    def get_first_ocurence_with_contexte(self, string, skip_lines=0, before=0, after=0):
+        for index, line in enumerate(self.n_lines[skip_lines:]):
             if string in line.text:
-                if inplace:
-                    self.n_lines = self.context(line_nb + start_line, before, after)
-                else:
-                    return self.context(line_nb + start_line, before, after)
+                return self.context(index + skip_lines, before, after)
+        return None
 
     def generator_for_ocurence_with_contexte(self, string, start_line=0, before=0, after=0):
 
@@ -266,11 +258,12 @@ permet de vérifier le type de séparateur utilisé"""
                     status = 1
         return buffer
 
-    def context(self, relative_line_number, before, after):
+    def context(self, idx, before, after):
         """Retourne une ligne avec son contexte depuis self.n_lines"""
         buffer = []
-        for i in range(relative_line_number + 1 - before, relative_line_number + after):
-            if self.n_lines[i]:
-                buffer.append((i, self.n_lines[i]))
-        return buffer
+        return self.n_lines[idx-before:idx+after+1]
+        # for i in range(idx - before, idx + after+1):
+        #     if self.n_lines[i]:
+        #         buffer.append((i, self.n_lines[i]))
+        # return buffer
 
