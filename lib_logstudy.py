@@ -52,7 +52,7 @@ class TextManipulator:
     lines = [] # list of strings
     n_lines = [] # list of NumberedLine (nb, string)
 
-    def __init__(self, filename=r"../input/*.csv", encoding="utf8"):
+    def __init__(self, filename=r"../input/*.csv", encoding="utf8"):    # Tested
         with open(filename, "r", encoding=encoding) as entree:
             self.lines = entree.readlines(LIMITE_CARACTERES_LUS)
         self.n_lines = [NumberedLine(num, text) for num, text in enumerate(self.lines, start=1)]
@@ -64,22 +64,22 @@ class TextManipulator:
     unix end of line will be separated in a list of strings"""
             self.lines = string.split("\n")
 
-    def __len__(self):
+    def __len__(self):  # Tested
         return len(self.n_lines)
 
-    def print_info(self):
+    def print_info(self):      # Tested
         print("Number of lines :  {}".format(len(self)))
 
-    def head(self, n=5):
+    def head(self, n=5):       # Tested
         self.n_lines = self.n_lines[:n]
 
-    def tail(self, n=5):
+    def tail(self, n=5):       # Tested
         self.n_lines = self.n_lines[-n:]
 
-    def slice(self, begin, end):
+    def slice(self, begin, end):   # Tested
         self.n_lines = self.n_lines[begin:end]
 
-    def sup_regex(self, pattern, skip=0):
+    def remove_regex(self, pattern, skip=0):      # Tested
         """Suppress lines containing a regex.
          modify self.n_lines"""
         p = re.compile(pattern)
@@ -87,9 +87,8 @@ class TextManipulator:
         self.n_lines = self.lines[0:skip]
         self.n_lines.extend(without_pattern)
 
-
-    def replace_regex(self, pattern, repl, skip=0):
-        """Remplace un motif par un autre"""
+    def replace_regex(self, pattern, repl, skip=0):      # Tested
+        """Remplace un motif par un autre."""
         p = re.compile(pattern)
         replaced_pattern = [ NumberedLine(line.num, p.sub(repl, line.text)) for line in self.n_lines[skip:]]
         # possible que cela soit plus rapide que :
@@ -97,7 +96,7 @@ class TextManipulator:
         self.n_lines = replaced_pattern
         # self.lines.extend(without_pattern)
 
-    def select_regex(self, pattern, skip=0):
+    def select_regex(self, pattern, skip=0):              # Tested
         """Ne conserve que les lignes avec une RegEx."""
         p = re.compile(pattern)
         # avecPat = [line for line in self.lines if p.match(line)]
@@ -106,14 +105,14 @@ class TextManipulator:
 
 
     def get_regex(self, pattern, skip=0):
-        """retourne les lignes contenant une regex"""
+        """retourne les lignes contenant une regex (sans toucher au n_lines)
+        returns NumberedLines"""
         p = re.compile(pattern)
-        avecPat = [line for line in self.lines[skip:] if p.match(line)]
-        return avecPat
+        with_pattern = [line for line in self.n_lines[skip:] if p.match(line.text)]
+        return with_pattern
 
-    def remove_empty_lines(self):
-        # print(mapage)
-        without_empty_lines = [line for line in self.n_lines if line.text != '\n']
+    def remove_empty_lines(self):   # tested
+        without_empty_lines = [line for line in self.n_lines if (line.text != '\n' and line.text != '')]
         self.n_lines = without_empty_lines
 
     def remove_carriage_return(self):
