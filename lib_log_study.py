@@ -57,13 +57,26 @@ class TextManipulator:
         self.n_lines = [NumberedLine(num, text) for num, text in enumerate(self.lines, start=1)]
         print("Number of initial lines :  {}".format(len(self.n_lines)))
 
+
     def loadString(self, string):
             """"A string containing
     unix end of line will be separated in a list of strings"""
             self.lines = string.split("\n")
 
+    def __len__(self):
+        return len(self.n_lines)
+
     def print_info(self):
-        print("Number of lines :  {}".format(len(self.n_lines)))
+        print("Number of lines :  {}".format(len(self)))
+
+    def head(self, n=5):
+        self.n_lines = self.n_lines[:n]
+
+    def tail(self, n=5):
+        self.n_lines = self.n_lines[-n:]
+
+    def slice(self, begin, end):
+        self.n_lines = self.n_lines[begin:end]
 
     def sup_regex(self, pattern):
         """Supprime les lignes contenant une RegEx.
