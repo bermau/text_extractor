@@ -56,10 +56,10 @@ test, sont des tests unitaires."""
         self.assertEqual(rep[5].text, '*** INFO [Task scheduler] 2020-11-18 10:15:18.68')
 
     def test_sup_regex(self):
-        print("Test de sup_regex")
+        print("Test de remove_regex")
         self.AA.remove_carriage_return()
-        self.AA.sup_regex(".*2020")
-        self.AA.sup_regex('-----|Executing')
+        self.AA.remove_regex(".*2020")
+        self.AA.remove_regex('-----|Executing')
         self.assertEqual(len(self.AA), 857)
 
 
