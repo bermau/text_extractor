@@ -52,13 +52,13 @@ test, sont des tests unitaires."""
     def test_head(self):
         self.AA.remove_carriage_return()
         self.AA.head(3)
-        self.AA.cat_lines()
+        self.AA.cat()
         self.assertEqual(self.AA.n_lines[-1].text, 'et voici sa fin sur la ligne 3')
 
     def test_tail(self):
         self.AA.remove_carriage_return()
         self.AA.tail(3)
-        self.AA.cat_lines()
+        self.AA.cat()
         self.assertEqual(self.AA.n_lines[-1].text, 'et voici sa fin. La fin est sur la ligne 9.')
         self.assertEqual(len(self.AA), 3)
 
@@ -67,14 +67,14 @@ test, sont des tests unitaires."""
         self.AA.tail(7) # 3456789
         self.AA.head(6) # 345678
         self.AA.slice(2, 4) # 56
-        self.AA.cat_lines()
+        self.AA.cat()
         self.assertTrue(self.AA.n_lines[-1].text.endswith("la ligne 6"))
         self.assertEqual(len(self.AA), 2)
 
     def test_seq(self):
         self.AA.remove_carriage_return()
         self.AA.head(3)
-        self.AA.cat_lines()
+        self.AA.cat()
         self.assertEqual(self.AA.n_lines[-1].text, 'et voici sa fin sur la ligne 3')
 
     def test_zz_sequence_1(self):
@@ -104,10 +104,10 @@ test, sont des tests unitaires."""
         print("Test de remove_regex simple")
         self.AA.remove_carriage_return()
         self.AA.remove_regex(".*ceci")
-        self.AA.cat_lines()
+        self.AA.cat()
         new_line()
         self.AA.remove_regex(".*para")
-        self.AA.cat_lines()
+        self.AA.cat()
         self.assertEqual(len(self.AA), 3)
 
     def test_select_regex(self):
@@ -115,23 +115,23 @@ test, sont des tests unitaires."""
         self.AA.remove_carriage_return()
         self.AA.select_regex(".*fin")
         self.assertEqual(len(self.AA), 4)
-        self.AA.cat_lines()
+        self.AA.cat()
 
     def test_replace_regex(self):
         print("Test pour replace_regex : remplacer ceci par cela puis supprimer cela. Restent 6 lignes")
         self.AA.remove_carriage_return()
         self.AA.replace_regex("ceci", "cela")
-        self.AA.cat_lines()
+        self.AA.cat()
         new_line()
         self.AA.remove_regex("cela")
-        self.AA.cat_lines()
+        self.AA.cat()
         self.assertEqual(self.AA.n_lines[-1].num, 9)
         self.assertEqual(len(self.AA), 6)
 
     def test_get_regex(self):
         print("Test de get_regex : Selectionner les ligne contenant fin")
         self.AA.remove_carriage_return()
-        self.AA.cat_lines()
+        self.AA.cat()
         new_line()
         selection_of_numberedlines = self.AA.get_regex(".*fin")
         self.assertEqual(len(selection_of_numberedlines), 4)
