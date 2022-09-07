@@ -83,6 +83,16 @@ test, sont des tests unitaires."""
         rep = self.AA.get_first_ocurence_with_contexte("Dossier 20141709", before=2, after=3)
         self.assertEqual(rep, None)
 
+    def test_get_first_ocurence_with_contexte(self):
+        print("Test de get_first_ocurence_with_contexte")
+        self.AA.remove_carriage_return()
+        rep = self.AA.get_first_ocurence_with_contexte("ligne", before=1, after=1)
+        self.AA.cat()
+        print(rep)
+        self.assertEqual(len(rep), 3)
+
+
+
     def test_remove_regex(self):
         print("Test de remove_regex complexe")
         self.AA.remove_carriage_return()
@@ -127,6 +137,14 @@ test, sont des tests unitaires."""
         self.assertEqual(len(selection_of_numberedlines), 4)
         self.assertEqual(selection_of_numberedlines[2].num, 7)
 
+    def test_get_context(self):
+        self.AA.remove_carriage_return()
+        select = self.AA.get_context(4,1,0)
+        self.AA.cat()
+        new_line()
+        display_lines(select)
+        self.assertEqual(len(select),2)
+        self.assertEqual(select[0].num, 4)
 
 def test_suite():
     """Retourne la liste des tests à traiter."""
