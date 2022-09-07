@@ -81,17 +81,14 @@ test, sont des tests unitaires."""
         print("Test de seq 1")
         self.AA.remove_carriage_return()
         rep = self.AA.get_first_ocurence_with_contexte("Dossier 20141709", before=2, after=3)
-        self.assertEqual(len(rep), 6)
-        self.assertEqual(rep[0].num, 832)
-        self.assertTrue(rep[5].text.endswith("10:15:18.68"))
-        self.assertEqual(rep[5].text, '*** INFO [Task scheduler] 2020-11-18 10:15:18.68')
+        self.assertEqual(rep, None)
 
     def test_sup_regex(self):
         print("Test de sup_regex")
         self.AA.remove_carriage_return()
         self.AA.sup_regex(".*2020")
         self.AA.sup_regex('-----|Executing')
-        self.assertEqual(len(self.AA), 857)
+        self.assertEqual(len(self.AA), 9)
 
 def test_suite():
     """Retourne la liste des tests à traiter."""
