@@ -21,11 +21,11 @@ test, sont des tests unitaires."""
         print("SetUp class environment")
 
     def setUp(self):
-        print("SetUp environment")
+        print("    SetUp environment")
         self.AA = lib_logstudy.TextManipulator(i_file, encoding='UTF-8')
 
     def tearDown(self):
-        print("Tearing down environment.\n")
+        print("    Tearing down environment.\n")
 
     def test_toujours_vrai(self):
         """.....Test toujours vrai """
@@ -83,21 +83,47 @@ test, sont des tests unitaires."""
         rep = self.AA.get_first_ocurence_with_contexte("Dossier 20141709", before=2, after=3)
         self.assertEqual(rep, None)
 
-    def test_sup_regex(self):
-        print("Test de sup_regex")
+    def test_remove_regex(self):
+        print("Test de remove_regex complexe")
         self.AA.remove_carriage_return()
-        self.AA.sup_regex(".*2020")
-        self.AA.sup_regex('-----|Executing')
+        self.AA.remove_regex(".*2020")
+        self.AA.remove_regex('-----|Executing')
         self.assertEqual(len(self.AA), 9)
 
+    def test_remove_regex_2(self):
+        print("Test de remove_regex simple")
+        self.AA.remove_carriage_return()
+        self.AA.remove_regex(".*ceci")
+        self.AA.cat_lines()
+        new_line()
+        self.AA.remove_regex(".*para")
+        self.AA.cat_lines()
+        self.assertEqual(len(self.AA), 3)
+
+    def test_select_regex(self):
+        print("Test de select_regex : On doit trouver 4 lignes avec le mot fin")
+        self.AA.remove_carriage_return()
+        self.AA.select_regex(".*fin")
+        self.assertEqual(len(self.AA), 4)
+        self.AA.cat_lines()
+
     def test_replace_regex(self):
+        print("Test pour replace_regex : remplacer ceci par cela puis supprimer cela. Restent 6 lignes")
         self.AA.remove_carriage_return()
         self.AA.replace_regex("ceci", "cela")
         self.AA.cat_lines()
         new_line()
-        self.AA.sup_regex("cela")
+        self.AA.remove_regex("cela")
         self.AA.cat_lines()
         self.assertEqual(self.AA.n_lines[-1].num, 9)
+        self.assertEqual(len(self.AA), 6)
+
+    def test_get_regex(self):
+        print("Test de get_regex")
+        self.AA.remove_carriage_return()
+        self.AA.cat_lines()
+        new_line()
+        print(self.AA.get_regex(".*fin"))
 
 
 def test_suite():
