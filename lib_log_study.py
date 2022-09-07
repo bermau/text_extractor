@@ -78,19 +78,14 @@ class TextManipulator:
     def slice(self, begin, end):
         self.n_lines = self.n_lines[begin:end]
 
-    def sup_regex(self, pattern):
-        """Supprime les lignes contenant une RegEx.
-- modifie self.n_lines"""
-        # PROBABLEMENT OK
+    def sup_regex(self, pattern, skip=0):
+        """Suppress lines containing a regex.
+         modify self.n_lines"""
         p = re.compile(pattern)
-        without_pattern = [line for line in self.n_lines if not p.match(line.text)]
-        self.n_lines = without_pattern
+        without_pattern = [line for line in self.n_lines[skip:] if not p.match(line.text)]
+        self.n_lines = self.lines[0:skip]
+        self.n_lines.extend(without_pattern)
 
-    def sup_regex_skiping(self, pattern, skip=0):
-        p = re.compile(pattern)
-        sansPat = [line for line in self.lines[skip:] if not p.match(line)]
-        self.lines = self.lines[0:skip]
-        self.lines.extend(sansPat)
 
     def replace_regex(self, pattern, repl, skip=0):
         """Remplace un motif par un autre"""
