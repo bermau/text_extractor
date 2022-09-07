@@ -46,7 +46,7 @@ test, sont des tests unitaires."""
         print("Test de len")
         self.assertEqual(len(self.AA.n_lines), 3503)
 
-    def test_zz_sequence_1(self):
+    def test_sequence_1(self):
         print("Test de seq 1")
         self.AA.remove_carriage_return()
         rep = self.AA.get_first_ocurence_with_contexte("Dossier 20141709", before=2, after=3)
@@ -62,6 +62,7 @@ test, sont des tests unitaires."""
         self.AA.sup_regex('-----|Executing')
         self.assertEqual(len(self.AA), 857)
 
+
 def test_suite():
     """Retourne la liste des tests à traiter."""
     tests = [unittest.makeSuite(CalculsTest)]
@@ -70,6 +71,6 @@ def test_suite():
 
 if __name__ == '__main__':
     """Programme de test de vérification."""
-    # lancer les unittest
+    # lancer les unittests
     suite = unittest.TestLoader().loadTestsFromTestCase(CalculsTest)
     unittest.TextTestRunner(verbosity=2).run(suite)
