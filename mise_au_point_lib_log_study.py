@@ -1,6 +1,6 @@
 # Fichier pour la mise au point.
-import lib_log_study
-from lib_log_study import display_lines
+import lib_logstudy
+from lib_logstudy import display_lines
 
 # i_file = r"./data_in/glimscron4_20220830_221610.log"
 i_file = r"./data_in/demo_short.log"
@@ -9,7 +9,7 @@ def new_line():
     print("*" * 30)
 
 
-AA = lib_log_study.TextManipulator(i_file, encoding="ANSI")
+AA = lib_logstudy.TextManipulator(i_file, encoding="ANSI")
 
 AA.print_info()
 #

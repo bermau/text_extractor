@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-import lib_log_study
-from lib_log_study import display_lines
+import lib_logstudy
+from lib_logstudy import display_lines
 
 i_file = r"data_in/demo_log_10_fictive_lines.log"
 
@@ -19,7 +19,7 @@ test, sont des tests unitaires."""
 
     def setUp(self):
         print("SetUp environment")
-        self.AA = lib_log_study.TextManipulator(i_file, encoding='UTF-8')
+        self.AA = lib_logstudy.TextManipulator(i_file, encoding='UTF-8')
 
     def tearDown(self):
         print("Tearing down environment.\n")

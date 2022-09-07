@@ -1,8 +1,8 @@
 # this file contains tests to validate my librairy
 
-from lib_log_study import *
+from lib_logstudy import *
 
-i_file = r"short_demo_log.log"
+i_file = r"data_in/demo_log_10_fictive_lines.log"
 
 AA = TextManipulator(i_file)
 print('***** first_ocurence *****')

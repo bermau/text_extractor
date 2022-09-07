@@ -1,7 +1,7 @@
 # Fichier pour la mise au point.
-import lib_log_study
+import lib_logstudy
 
-i_file = r"./data_in/very_short.log"
+i_file = r"data_in/demo_log_72_lines.log"
 
 AA = log_study.TextManipulator(i_file)
 AA.print_info()
