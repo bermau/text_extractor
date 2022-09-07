@@ -32,8 +32,11 @@ def mark_doubleline_block(numbered_lines):
 
 
 def mark_line_block(numbered_lines):
-    numbered_lines.append((0, "*" * 20 + "\n"))
+    numbered_lines.append(NumberedLine(0, "*" * 20 ))
     return numbered_lines
+
+def newline():
+    print("*" * 30)
 
 @dataclass
 class NumberedLine:
@@ -56,7 +59,6 @@ class TextManipulator:
         with open(filename, "r", encoding=encoding) as entree:
             self.lines = entree.readlines(LIMITE_CARACTERES_LUS)
         self.n_lines = [NumberedLine(num, text) for num, text in enumerate(self.lines, start=1)]
-        print("Number of initial lines :  {}".format(len(self.n_lines)))
 
 
     def loadString(self, string):
@@ -115,7 +117,7 @@ class TextManipulator:
         without_empty_lines = [line for line in self.n_lines if (line.text != '\n' and line.text != '')]
         self.n_lines = without_empty_lines
 
-    def remove_carriage_return(self):
+    def remove_carriage_return(self):  # tested
         for line in self.n_lines:
             line.text = line.text.replace('\n', '')
 
@@ -159,10 +161,12 @@ cible;Moyenne;SD;CV
 Type;Moyenne;SD;CV;Nb"""
         return ent
 
-    def cat_lines(self):
+    def cat(self):
         # print(self.formatEntete())
         for line in self.n_lines:
             print(line.num, line.text)
+
+
 
     def writeFile(self, filename=r"./data_out/output.csv"):
         """Ecrit le résultat des lignes"""
@@ -185,15 +189,15 @@ permet de vérifier le type de séparateur utilisé"""
     def containing(self, string):
         return [(line_nb, line) for line_nb, line in enumerate(self.lines) if string in line]
 
-    def first_ocurence(self, string):
-        for line in self.n_lines:
-            if string in line.text:
-                return [line]
+    # def first_ocurence(self, string):
+    #     for line in self.n_lines:
+    #         if string in line.text:
+    #             return [line]
 
-    def get_first_ocurence_with_contexte(self, string, skip_lines=0, before=0, after=0):
+    def get_first_ocurence_with_contexte(self, string, skip_lines=0, before=0, after=0):  # tested
         for index, line in enumerate(self.n_lines[skip_lines:]):
             if string in line.text:
-                return self.context(index + skip_lines, before, after)
+                return self.get_context(index + skip_lines, before, after)
         return None
 
     def generator_for_ocurence_with_contexte(self, string, start_line=0, before=0, after=0):
@@ -202,7 +206,7 @@ permet de vérifier le type de séparateur utilisé"""
         for line_nb, line in enumerate(self.lines[compteur:]):
             if string in line:
                 compteur += line_nb
-                yield self.context(line_nb, before, after)
+                yield self.get_context(line_nb, before, after)
 
     def find_all(self, string, start_line=0, before=0, after=0):
         gene = self.generator_for_ocurence_with_contexte(string=string, start_line=start_line, before=before, after=after)
@@ -214,39 +218,51 @@ permet de vérifier le type de séparateur utilisé"""
         display_lines(buf)
         print("*******************")
 
-    def generator_debut_fin(self, init_pattern, end_pattern, start_line=0, before=0, after=0):
+    def generator_for_begin_end_block(self, init_pattern, end_pattern, skip=0, before=0, after=0): # Tested
 
-        compteur = start_line
+        compteur = skip
         buffer = []
         status = 0
-        for line_nb, line in enumerate(self.lines[start_line:]):
+        for line_nb, numbered_line in enumerate(self.n_lines[skip:]):
 
             if status == 1:  # un début de block a déjà été trouvé :
-                if end_pattern not in line:
-                    buffer.append((line_nb, line))
+                if end_pattern not in numbered_line.text:
+                    buffer.append(numbered_line)
                 else:  # On a trouvé le signal de fin
-                    buffer.append((line_nb, line))
+                    buffer.append(numbered_line)
                     status = 0
                     compteur += line_nb
                     yield buffer
 
             elif status == 0: # En cours de recherche
-                if init_pattern in line:
-                    buffer = [(line_nb, line)]
+                if init_pattern in numbered_line.text:
+                    buffer = [numbered_line]
                     status = 1  # un début de block a été trouvé
 
 
 
-    def find_all_begin_end_block(self, init_pattern, end_pattern, start_line=0, before=0, after=0):
-        gene = self.generator_debut_fin(init_pattern=init_pattern, end_pattern=end_pattern,
-                                        start_line=start_line, before=before, after=after)
+    def get_all_begin_end_block(self, init_pattern, end_pattern, start_line=0,
+                                before=0, after=0, mark_block= True):  # tested
+
+        gene = self.generator_for_begin_end_block(init_pattern=init_pattern,
+                                                  end_pattern=end_pattern,
+                                                  skip=start_line, before=before, after=after)
         buf = []
         for block in gene:
             if block:
-                buf.extend(mark_line_block(block))
+                if mark_block:
+                    buf.extend(mark_line_block(block))
+                else:
+                    buf.extend(block)
         print("***************************************")
         display_lines(buf)
         print("***************************************")
+        return buf
+
+    def select_all_begin_end_block(self, *args, **kwargs):
+        """Idem as get_  but modify self.n_lines"""
+        select = self.get_all_begin_end_block(*args,**kwargs)
+        self.n_lines = select
 
     def debut_fin_first(self, init_pattern, end_pattern):
         status = 0
@@ -266,12 +282,9 @@ permet de vérifier le type de séparateur utilisé"""
                     status = 1
         return buffer
 
-    def context(self, idx, before, after):
+    def get_context(self, idx, before, after):
         """Retourne une ligne avec son contexte depuis self.n_lines"""
         buffer = []
         return self.n_lines[idx-before:idx+after+1]
-        # for i in range(idx - before, idx + after+1):
-        #     if self.n_lines[i]:
-        #         buffer.append((i, self.n_lines[i]))
-        # return buffer
+
 
