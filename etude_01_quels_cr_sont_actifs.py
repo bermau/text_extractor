@@ -11,8 +11,6 @@ from lib_bm_utils import readkey, title
 
 i_file = r"./data_in/glimscron4_20220830_221610.log"
 
-
-
 AA = lib_logstudy.TextManipulator(i_file, encoding="ANSI")
 AA.remove_carriage_return()
 # AA.cat()
