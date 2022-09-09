@@ -151,10 +151,16 @@ cible;Moyenne;SD;CV
 Type;Moyenne;SD;CV;Nb"""
         return ent
 
-    def cat(self):  # tested
+    def cat(self, quiet=False):  # tested
         # print(self.formatEntete())
         for line in self.n_lines:
-            print(line.num, line.text)
+            if quiet:
+                print(line.text)
+            else:
+                print(line.num, line.text)
+
+    def to_list(self, quiet=True):
+        return [line.text for line in self.n_lines]
 
     def writeFile(self, filename=r"./data_out/output.csv"):
         """Ecrit le résultat des lignes"""
