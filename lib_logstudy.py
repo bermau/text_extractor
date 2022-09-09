@@ -238,10 +238,9 @@ Type;Moyenne;SD;CV;Nb"""
                     buf.extend(mark_line_block(block))
                 else:
                     buf.extend(block)
-        print("***************************************")
-        display_lines(buf)
-        print("***************************************")
         return buf
+
+
 
     def select_all_begin_end_block(self, *args, **kwargs):
         """Idem as get_  but modify self.n_lines"""
