@@ -72,10 +72,18 @@ class TextManipulator:
     lines = []  # list of strings
     n_lines = []  # list of NumberedLine (nb, string)
 
-    def __init__(self, filename=r"../input/*.csv", encoding="utf8"):  # Tested
-        with open(filename, "r", encoding=encoding) as entree:
-            self.lines = entree.readlines(LIMITE_CARACTERES_LUS)
-        self.n_lines = [NumberedLine(num, text) for num, text in enumerate(self.lines, start=1)]
+    def __init__(self, input_source=r"../input/*.csv", encoding="utf8"):  # Tested
+        """Create TextManipulator objet.
+        The source of lines is a file or another TextManipulator"""
+        if isinstance(input_source, str):
+            with open(input_source, "r", encoding=encoding) as entree:
+                self.lines = entree.readlines(LIMITE_CARACTERES_LUS)
+            self.n_lines = [NumberedLine(num, text) for num, text in enumerate(self.lines, start=1)]
+        elif isinstance(input_source, TextManipulator):
+            self.n_lines = input_source.n_lines
+        elif isinstance(input_source, list):
+            self.n_lines = input_source
+
 
     def loadString(self, string):
         """"A string containing
@@ -160,7 +168,10 @@ Type;Moyenne;SD;CV;Nb"""
                 print(line.num, line.text)
 
     def to_list(self, quiet=True):
-        return [line.text for line in self.n_lines]
+        if quiet:
+            return [line.text for line in self.n_lines]
+        else:
+            return self.n_lines
 
     def writeFile(self, filename=r"./data_out/output.csv"):
         """Ecrit le résultat des lignes"""
@@ -205,7 +216,7 @@ Type;Moyenne;SD;CV;Nb"""
         print("*******************")
 
     def generator_for_begin_end_block(self, init_pattern, end_pattern, skip=0, before=0, after=0):  # Tested
-
+        """Return a list a NumberedLines"""
         compteur = skip
         buffer = []
         status = 0
