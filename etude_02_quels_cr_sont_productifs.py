@@ -10,7 +10,7 @@ import glob
 
 
 # import pandas as pd
-sys.path.append("../HI_31_outils_divers")
+sys.path.append("../../HI_31_outils_divers")
 from lib_bm_utils import readkey, title
 
 default_file = r"./data_in/glimscron4_20220830_221610.log"
@@ -26,7 +26,8 @@ def get_all_begin_end_block(self, init_pattern, end_pattern, start_line=0,
     for block in gene:
         if len(block) != 7:    # NOUVEAU
             # On va créer un sous-objet
-            block_a_enregistrer = [NumberedLine(0, block[0].text)]
+            # keep only the first line of the block
+            block_a_enregistrer = [block[0]]
             block_obj = TextManipulator(block)
             info = "Bloc de {} lignes".format(len(block_obj))
             block_obj.select_regex(".*/messages")
@@ -44,6 +45,7 @@ def get_all_begin_end_block(self, init_pattern, end_pattern, start_line=0,
     return buf
 
 lib_logstudy.TextManipulator.get_all_begin_end_block = get_all_begin_end_block
+
 
 def select_lines(self, begin_line_num, end_line_num):
     """select lines from to line (numbers are numbers in the original file"""
@@ -66,7 +68,7 @@ lib_logstudy.TextManipulator.select_lines = select_lines
 
 def traitement(i_file = default_file):
     title ("Etude du log de "+ i_file)
-    AA = lib_logstudy.TextManipulator(i_file, encoding="ANSI")
+    AA = lib_logstudy.TextManipulator(i_file, encoding="latin1")
     AA.remove_carriage_return()
     # AA.cat()
     print("Taille du fichier initial est : ", len(AA))
