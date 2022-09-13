@@ -199,10 +199,10 @@ Type;Moyenne;SD;CV;Nb"""
     def generator_for_ocurence_with_contexte(self, string, start_line=0, before=0, after=0):
 
         compteur = start_line
-        for line_nb, line in enumerate(self.lines[compteur:]):
-            if string in line:
-                compteur += line_nb
-                yield self.get_context(line_nb, before, after)
+        for nb, line in enumerate(self.n_lines[compteur:]):
+            if string in line.text:
+                compteur += nb
+                yield self.get_context(nb, before, after)
 
     def find_all(self, string, start_line=0, before=0, after=0):
         gene = self.generator_for_ocurence_with_contexte(string=string, start_line=start_line, before=before,
@@ -211,9 +211,8 @@ Type;Moyenne;SD;CV;Nb"""
         for block in gene:
             if block:
                 buf.extend(mark_line_block(block))
-        print("*******************")
-        display_lines(buf)
-        print("*******************")
+        self.n_lines = buf
+
 
     def generator_for_begin_end_block(self, init_pattern, end_pattern, skip=0, before=0, after=0):  # Tested
         """Return a list a NumberedLines"""

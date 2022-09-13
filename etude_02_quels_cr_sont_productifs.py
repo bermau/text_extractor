@@ -34,7 +34,7 @@ def get_all_begin_end_block(self, init_pattern, end_pattern, start_line=0,
             block_obj = TextManipulator(block)
             info = "Bloc de {} lignes".format(len(block_obj))
             block_obj.select_regex(".*/messages")
-            block_obj.cat()
+            # block_obj.cat()
             block_lines = block_obj.to_list(quiet=False)
             block_ln = len(block_obj)
             info += " {} messages".format(block_ln)
@@ -82,10 +82,15 @@ def traitement(i_file=default_file):
     AA.select_all_begin_end_block("Task start", "Task end")
     # AA.sce(15000, 15500)
     # AA.select_lines(21634, 21700)
+
+    AA.head(50)
     AA.cat()
     readkey("t...")
 
+    title("Etape 2 : généré commande | nombre de documents générés")
 
+    AA.find_all("Task start", before = 0, after = 1)
+    AA.cat()
 if __name__ == '__main__':
     traitement()
 # BOUCLE
