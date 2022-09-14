@@ -52,8 +52,8 @@ class NumberedText:  # Unused ?
             print(line.num, line.text)
 
 
-def get_imposer_marques(ligne='', positions=[], longueur=0):
-    """renvoie la ligne 1 mise à la longueur et en remplaçant les caractères situés à la liste
+def get_imposer_marques(ligne='', positions=None, longueur=0):
+    """Renvoie la ligne 1 mise à la longueur et en remplaçant les caractères situés à la liste
      de positions par un caractère |
      ????
      """
