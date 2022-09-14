@@ -250,8 +250,11 @@ Type;Moyenne;SD;CV;Nb"""
 
     def select_all_begin_end_block(self, *args, **kwargs):
         """Find all blocks starting with a regex, ending with another regex.
-         blocks may be treated by a function.
-        The block is ungreedy (gives the shortest block)
+         blocks can be treated by a function.
+        The block is ungreedy (gives the shortest block).
+
+        key words = init_pattern, end_pattern, start_line=0, before=0, after=0, block_action=None,
+                    mark_block=True
 
         Idem as get_  but modify self.n_lines"""
 
