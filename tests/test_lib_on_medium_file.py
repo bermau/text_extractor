@@ -4,7 +4,7 @@ from unittest.mock import patch
 import lib_logstudy
 from lib_logstudy import display_lines
 
-i_file = r"./data_in/demo_short.log"
+i_file = r"../data_in/demo_short.log"
 
 def greet(name):
     print('Hello ', name)

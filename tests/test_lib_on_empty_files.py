@@ -4,7 +4,7 @@ from unittest.mock import patch
 import lib_logstudy
 from lib_logstudy import display_lines
 
-i_file = r"data_in/demo_log_10_lines_with_empty_lines.log"
+i_file = r"../data_in/demo_log_10_lines_with_empty_lines.log"
 
 def new_line():
     print("*" * 30)
