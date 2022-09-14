@@ -178,13 +178,7 @@ Type;Moyenne;SD;CV;Nb"""
             # sortie.write(self.formatEntete())
             sortie.write("\n")
             for line in self.n_lines:
-                sortie.write(line.num, line.text + "\n")
-
-    def writeFileForCSV(self, filename=r"../output/output.csv"):
-        """Ecrit le résultat des lignes"""
-        with open(filename, "w", encoding="latin1") as sortie:
-            for line in self.lignesPourTableur:
-                sortie.write(line + "\n")
+                sortie.write(line.num + "\t" + line.text + "\n")
 
     def containing(self, string):
         return [(line_nb, line) for line_nb, line in enumerate(self.lines) if string in line]
