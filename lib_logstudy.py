@@ -83,7 +83,15 @@ class TextManipulator:
         elif isinstance(input_source, TextManipulator):
             self.n_lines = input_source.n_lines
         elif isinstance(input_source, list):
-            self.n_lines = input_source
+            # Liste de liste Cette parti est mal écrite mais elle est utilisée.
+            if isinstance(input_source[0], NumberedLine):
+                # Liste de liste Cette parti est mal écrite mais elle est utilisée.
+                print("Création par liste de NumeredLine")
+                self.n_lines = input_source
+            elif isinstance(input_source[0], list):
+                print("Création par liste de liste")
+            # Liste de liste Cette parti est mal écrite mais elle est utilisée.
+                self.n_lines = [ NumberedLine(val_num, val_text) for val_num, val_text in input_source ]
 
     def loadString(self, string):
         """"A string containing
@@ -173,6 +181,11 @@ Type;Moyenne;SD;CV;Nb"""
         else:
             return self.n_lines
 
+    def to_list_of_list(self, quiet=True):
+        if quiet:
+            return [line.text for line in self.n_lines]
+        else:
+            return [ [line.num, line.text ] for line in self.n_lines]
 
     def writeFile(self, filename=r"./data_out/output.csv"):
         """Ecrit la liste des lignes sur un fichier"""
