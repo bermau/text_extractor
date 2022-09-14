@@ -18,7 +18,6 @@ from lib_bm_utils import readkey, title
 default_file = r"./data_in/glimscron4_20220830_221610.log"
 
 
-
 def action_on_main_block(block):
     """Return the number of lines, then the lines"""
     buf = []
