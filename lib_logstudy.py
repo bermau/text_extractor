@@ -173,6 +173,7 @@ Type;Moyenne;SD;CV;Nb"""
         else:
             return self.n_lines
 
+
     def writeFile(self, filename=r"./data_out/output.csv"):
         """Ecrit la liste des lignes sur un fichier"""
         with open(filename, "w", encoding="latin1") as sortie:
