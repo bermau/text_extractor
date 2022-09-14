@@ -59,7 +59,7 @@ def select_lines(self, begin_line_num, end_line_num):
         if status == 1:
             buf.append(line)
             if line.num >= end_line_num:
-                status == 0
+                status = 0
                 break
         elif status == 0:
             if line.num == begin_line_num:
@@ -69,6 +69,10 @@ def select_lines(self, begin_line_num, end_line_num):
 
 
 lib_logstudy.TextManipulator.select_lines = select_lines
+
+
+def simple_action_on_block(block):
+    return block
 
 
 def traitement(i_file=default_file):
@@ -84,13 +88,21 @@ def traitement(i_file=default_file):
     # AA.select_lines(21634, 21700)
 
     AA.head(50)
+    print()
     AA.cat()
-    readkey("t...")
+    # readkey("t...")
 
     title("Etape 2 : généré commande | nombre de documents générés")
 
-    AA.find_all("Task start", before = 0, after = 1)
+    AA.select_all_begin_end_block(init_pattern="Task start", end_pattern=".*message", start_line=0,
+                                  before=0, after=0, mark_block=True,  # Tested
+                                  # block_action=simple_action_on_block
+                                  )
+
+    # AA.find_all("Task start", before = 0, after = 1)
     AA.cat()
+
+
 if __name__ == '__main__':
     traitement()
 # BOUCLE

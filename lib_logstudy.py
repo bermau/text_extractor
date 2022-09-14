@@ -212,9 +212,8 @@ Type;Moyenne;SD;CV;Nb"""
                 buf.extend(mark_line_block(block))
         self.n_lines = buf
 
-
     def generator_for_begin_end_block(self, init_pattern, end_pattern, skip=0, before=0, after=0):  # Tested
-        """Return a list a NumberedLines"""
+        """Return block, that is a list a NumberedLines"""
         compteur = skip
         buffer = []
         status = 0
@@ -234,8 +233,9 @@ Type;Moyenne;SD;CV;Nb"""
                     buffer = [numbered_line]
                     status = 1  # un début de block a été trouvé
 
+    # Remember : block is a list a NumberedLines
     def get_all_begin_end_block(self, init_pattern, end_pattern, start_line=0,
-                                before=0, after=0, mark_block=True):  # tested
+                                before=0, after=0, block_action=None, mark_block=True):  # NOT tested
 
         gene = self.generator_for_begin_end_block(init_pattern=init_pattern,
                                                   end_pattern=end_pattern,
@@ -243,16 +243,23 @@ Type;Moyenne;SD;CV;Nb"""
         buf = []
         for block in gene:
             if block:
+                if block_action:
+                    block = block_action(block)
+
                 if mark_block:
                     buf.extend(mark_line_block(block))
                 else:
                     buf.extend(block)
+
         return buf
 
-
-
     def select_all_begin_end_block(self, *args, **kwargs):
-        """Idem as get_  but modify self.n_lines"""
+        """Find all blocks starting with a regex, ending with another regex.
+         blocks may be treated by a function.
+        The block is ungreedy (gives the shortest block)
+
+        Idem as get_  but modify self.n_lines"""
+
         select = self.get_all_begin_end_block(*args, **kwargs)
         self.n_lines = select
 
