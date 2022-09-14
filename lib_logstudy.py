@@ -240,7 +240,6 @@ Type;Moyenne;SD;CV;Nb"""
             if block:
                 if block_action:
                     block = block_action(block)
-
                 if mark_block:
                     buf.extend(mark_line_block(block))
                 else:
@@ -275,6 +274,23 @@ Type;Moyenne;SD;CV;Nb"""
                     buffer.append((line_nb, line))
                     status = 1
         return buffer
+
+    def select_lines(self, begin_line_num, end_line_num):
+        """Select lines from to line (numbers are the positions in the original file)
+        begin_line and end_line are included."""
+        buf = []
+        status = 0
+        for line in self.n_lines:
+            if status == 1:
+                buf.append(line)
+                if line.num >= end_line_num:
+                    status = 0
+                    break
+            elif status == 0:
+                if line.num == begin_line_num:
+                    buf.append(line)
+                    status = 1
+        self.n_lines = buf
 
     def get_context(self, idx, before, after):
         """Retourne une ligne avec son contexte depuis self.n_lines"""

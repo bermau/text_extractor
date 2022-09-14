@@ -51,26 +51,6 @@ def get_all_begin_end_block(self, init_pattern, end_pattern, start_line=0,
 lib_logstudy.TextManipulator.get_all_begin_end_block = get_all_begin_end_block
 
 
-def select_lines(self, begin_line_num, end_line_num):
-    """select lines from to line (numbers are numbers in the original file"""
-    buf = []
-    status = 0
-    for line in self.n_lines:
-        if status == 1:
-            buf.append(line)
-            if line.num >= end_line_num:
-                status = 0
-                break
-        elif status == 0:
-            if line.num == begin_line_num:
-                buf.append(line)
-                status = 1
-    self.n_lines = buf
-
-
-lib_logstudy.TextManipulator.select_lines = select_lines
-
-
 def simple_action_on_block(block):
     return block
 
@@ -83,20 +63,20 @@ def traitement(i_file=default_file):
     print("Taille du fichier initial est : ", len(AA))
     title("Récupération de tous les 'Task Start'")
 
-    AA.select_all_begin_end_block("Task start", "Task end")
+    # AA.select_all_begin_end_block("Task start", "Task end")
     # AA.sce(15000, 15500)
     # AA.select_lines(21634, 21700)
 
-    AA.head(50)
+    # AA.head(50)
     print()
-    AA.cat()
+    # AA.cat()
     # readkey("t...")
 
     title("Etape 2 : généré commande | nombre de documents générés")
 
     AA.select_all_begin_end_block(init_pattern="Task start", end_pattern=".*message", start_line=0,
-                                  before=0, after=0, mark_block=True,  # Tested
-                                  # block_action=simple_action_on_block
+                                  before=0, after=0, mark_block=True, block_action=simple_action_on_block  # Tested
+
                                   )
 
     # AA.find_all("Task start", before = 0, after = 1)

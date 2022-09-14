@@ -62,6 +62,15 @@ test, sont des tests unitaires."""
         self.AA.remove_regex('-----|Executing')
         self.assertEqual(len(self.AA), 857)
 
+    def test_select_lines(self):
+        print("Test de select()")
+        self.AA.remove_carriage_return()
+        self.AA.remove_regex(".*2020")
+        self.AA.select_lines(10, 16)
+        self.assertEqual(self.AA.n_lines[0].num, 10)
+        self.assertEqual(self.AA.n_lines[-1].num, 16)
+        self.AA.cat()
+
 
 def test_suite():
     """Retourne la liste des tests à traiter."""
