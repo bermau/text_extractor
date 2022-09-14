@@ -2,6 +2,7 @@
 
 import sys
 import lib_logstudy
+import re
 
 from lib_logstudy import display_lines, mark_line_block, TextManipulator, NumberedLine
 from pprint import pprint
@@ -16,7 +17,6 @@ sys.path.append("../HI_31_outils_divers")
 from lib_bm_utils import readkey, title
 
 default_file = r"./data_in/glimscron4_20220830_221610.log"
-
 
 
 
@@ -42,10 +42,26 @@ def action_on_main_block(block):
 
     return  buf
 
+def summary_of_block(block):
+    """Un résumé du block en une ligne"""
+# Exemple de block :
+# 42552 Task start: 31/08/2022 17:36:13 '107 - CR_LABO_Complet PDF'
+# 0 Bloc de 155 lignes, contentant 24 messages
+
+    buf = []
+    if block != []:
+        first_line=  block[0].text
+        line1 = first_line[first_line.index(" '"):]
+
+        extract = re.search(r"(\d+) lignes.* (\d+) messages", block[1].text)
+        buf.append(NumberedLine(block[0].num,"\t".join([line1, extract.groups()[0], extract.groups()[1]] )))
+    return buf
 
 def no_action_on_block(block):
     """Just to test signature"""
     return block
+
+
 
 def main(i_file=default_file):
     title("Etude du log de " + i_file)
@@ -64,16 +80,15 @@ def main(i_file=default_file):
     # AA.head(500)
     print()
     AA.cat()
-    readkey("t...")
-
-    title("Etape 2 : généré commande | nombre de documents générés")
-    #
-    # AA.select_all_begin_end_block(init_pattern="Task start", end_pattern=".*message", start_line=0,
-    #                               before=0, after=0, mark_block=True, block_action=simple_action_on_block  # Tested
-    #                               )
-
-    # AA.find_all("Task start", before = 0, after = 1)
+    # readkey("Retirer les marques de bloc ...")
+    title("Retirer les marques de bloc, faire résumé en une ligne")
+    AA.select_all_begin_end_block("Task start", "****",
+                                  mark_block=False,
+                                  block_action=summary_of_block
+                                  )
     AA.cat()
+    print("Nombre de lignes", str(len(AA)))
+    AA.writeFile()
 
 
 if __name__ == '__main__':
