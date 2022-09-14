@@ -1,8 +1,9 @@
 # Utilisation : Quel sont les commandes productives ?
-
+import os.path
 import sys
 import lib_logstudy
 import re
+import pandas as pd
 
 from lib_logstudy import display_lines, mark_line_block, TextManipulator, NumberedLine
 from pprint import pprint
@@ -10,9 +11,7 @@ import glob
 
 # Vers la ligne 21634,il y a une suite d'impression.
 
-
 # import pandas as pd
-
 sys.path.append("../HI_31_outils_divers")
 from lib_bm_utils import readkey, title
 
@@ -65,6 +64,8 @@ def no_action_on_block(block):
 
 def main(i_file=default_file):
     title("Etude du log de " + i_file)
+
+
     AA = lib_logstudy.TextManipulator(i_file, encoding="latin1")
     AA.remove_carriage_return()
     # AA.cat()
@@ -76,29 +77,34 @@ def main(i_file=default_file):
                                   block_action=action_on_main_block)
 
     # AA.select_lines(21174, 21174 + 300)
-
-    # AA.head(500)
     print()
     AA.cat()
-    # readkey("Retirer les marques de bloc ...")
+
     title("Retirer les marques de bloc, faire résumé en une ligne")
-    AA.select_all_begin_end_block("Task start", "****",
-                                  mark_block=False,
-                                  block_action=summary_of_block
-                                  )
+    AA.select_all_begin_end_block("Task start", "****", mark_block=False, block_action=summary_of_block)
     AA.cat()
     print("Nombre de lignes", str(len(AA)))
-    AA.writeFile()
+    # On va trier les lignes avec pandas, qui accepte des listes de listes
+    df_aa = pd.DataFrame(AA.to_list_of_list(quiet=False).copy(), columns=['num', 'text'])
+    df_bb = df_aa.sort_values(by='text')
+    print(df_bb)       # OK
+    # soit sort df_bb sur un fichier, soit on crée un TextManipulator
+    print(df_bb.values.tolist())
 
+    BB = lib_logstudy.TextManipulator(df_bb.values.tolist(), encoding="latin1")
+    BB.cat()
+    BB.writeFile(os.path.join("./data_out","sortie_"+os.path.basename(i_file)+'.csv'))
+    file_name = os.path.join("./data_out", "sortie_" + os.path.basename(i_file) + '.csv')
+    print("Sortie des données sur ", file_name)
+    BB.writeFile(file_name)
 
 if __name__ == '__main__':
-    main()
+    # main()
 # BOUCLE
-#     lst_fichiers_a_traiter  = sorted(glob.glob("./data_in/glims*.log"))
-#     pprint(lst_fichiers_a_traiter)
-#
-#     for file in lst_fichiers_a_traiter:
-#         traitement(file)
+    lst_fichiers_a_traiter  = sorted(glob.glob("./data_in/glims*.log"))
+    pprint(lst_fichiers_a_traiter)
 
+    for file in lst_fichiers_a_traiter:
+        main(file)
+        input("Key to continue...")
 
-# Imprimer sans les numéros de lignes.
