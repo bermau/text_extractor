@@ -147,8 +147,8 @@ class TextManipulator:
         """Remove FF characters (hexadecimal 0C). Attention : python waits for 0C et returns 0c in lower case.
         In my experiment, there where FF et des FF followed by LF"""
         # Not tested !!
-        sansFF = [line for line in self.n_lines if line.text not in ('\x0C\n', '\x0C')]
-        self.n_lines = sansFF
+        without_ff = [line for line in self.n_lines if line.text not in ('\x0C\n', '\x0C')]
+        self.n_lines = without_ff
 
     def formatEntete(self):
         """Insertion d'une entête expliquant les colonnes extraites"""
