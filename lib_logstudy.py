@@ -58,6 +58,8 @@ def get_imposer_marques(ligne='', positions=[], longueur=0):
      de positions par un caractère |
      ????
      """
+    if positions is None:
+        positions = []
     ligne = ligne.ljust(longueur)
     ligne_out = ''
     for i in range(len(ligne)):
