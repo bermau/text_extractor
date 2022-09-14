@@ -84,7 +84,6 @@ class TextManipulator:
         elif isinstance(input_source, list):
             self.n_lines = input_source
 
-
     def loadString(self, string):
         """"A string containing
     unix end of line will be separated in a list of strings"""
