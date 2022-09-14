@@ -40,14 +40,14 @@ test, sont des tests unitaires."""
         mock_print.assert_called_with("Number of lines :  72")
 
     def test_get_all_begin_end_block(self):
-        print("Test de get_all_begin_end_block : Selectionner les blocks Task start/ Executing task")
+        print("Test de get_all_begin_end_blocks : Selectionner les blocks Task start/ Executing task")
         self.AA.remove_carriage_return()
         self.AA.cat()
         new_line()
 
-        select = self.AA.get_all_begin_end_block(init_pattern="Task start:",
-                                                 end_pattern="Executing task",
-                                                 mark_block=False)
+        select = self.AA.get_all_begin_end_blocks(init_pattern="Task start:",
+                                                  end_pattern="Executing task",
+                                                  mark_block=False)
         display_lines(select)
         new_line()
         self.assertEqual(len(select), 21)

@@ -14,7 +14,7 @@ AA = lib_logstudy.TextManipulator(i_file, encoding="utf-8")
 AA.print_info()
 
 #
-# AA.get_all_begin_end_block(init_pattern="Task start:", end_pattern="Executing task")
+# AA.get_all_begin_end_blocks(init_pattern="Task start:", end_pattern="Executing task")
 # AA.supRegex("0 ")
 # AA.supp_empty_lines()
 AA.remove_carriage_return()

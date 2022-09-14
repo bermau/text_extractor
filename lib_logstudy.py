@@ -229,14 +229,14 @@ Type;Moyenne;SD;CV;Nb"""
                     status = 1  # un début de block a été trouvé
 
     # Remember : block is a list a NumberedLines
-    def get_all_begin_end_block(self, init_pattern, end_pattern, start_line=0,
-                                before=0, after=0, block_action=None, mark_block=True):  # NOT tested
+    def get_all_begin_end_blocks(self, init_pattern, end_pattern, start_line=0,
+                                 before=0, after=0, block_action=None, mark_block=True):  # NOT tested
 
-        gene = self.generator_for_begin_end_block(init_pattern=init_pattern,
+        block_generator = self.generator_for_begin_end_block(init_pattern=init_pattern,
                                                   end_pattern=end_pattern,
                                                   skip=start_line, before=before, after=after)
         buf = []
-        for block in gene:
+        for block in block_generator:
             if block:
                 if block_action:
                     block = block_action(block)
@@ -254,7 +254,7 @@ Type;Moyenne;SD;CV;Nb"""
 
         Idem as get_  but modify self.n_lines"""
 
-        select = self.get_all_begin_end_block(*args, **kwargs)
+        select = self.get_all_begin_end_blocks(*args, **kwargs)
         self.n_lines = select
 
     def debut_fin_first(self, init_pattern, end_pattern):
