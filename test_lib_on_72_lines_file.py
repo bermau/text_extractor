@@ -12,6 +12,7 @@ def greet(name):
 def new_line():
     print("*" * 30)
 
+
 class CalculsTest(unittest.TestCase):
     """Cette classe contient les méthodes qui, si elles commencent par le mot
 test, sont des tests unitaires."""
