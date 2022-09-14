@@ -6,7 +6,6 @@ from dataclasses import dataclass
 
 LIMITE_CARACTERES_LUS = 0  # pour debugger.
 import re
-import pdb
 
 
 def display_lines(numbered_lines):
