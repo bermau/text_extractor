@@ -240,10 +240,11 @@ Type;Moyenne;SD;CV;Nb"""
             if block:
                 if block_action:
                     block = block_action(block)
-                if mark_block:
-                    buf.extend(mark_line_block(block))
-                else:
-                    buf.extend(block)
+                if block != []:
+                    if mark_block:
+                        buf.extend(mark_line_block(block))
+                    else:
+                        buf.extend(block)
 
         return buf
 
