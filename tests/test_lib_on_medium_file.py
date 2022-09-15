@@ -19,8 +19,8 @@ test, sont des tests unitaires."""
 
     def setUp(self):
         print("SetUp environment")
-        self.AA = lib_logstudy.TextManipulator(i_file, encoding='ANSI')
-
+        # self.AA = lib_logstudy.TextManipulator(i_file, encoding='ANSI')  # OK on Window
+        self.AA = lib_logstudy.TextManipulator(i_file, encoding='latin1')  # OK on Linux
     def tearDown(self):
         print("Tearing down environment.\n")
 

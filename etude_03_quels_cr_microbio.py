@@ -48,7 +48,7 @@ def summary_of_block(block):
     # 0 Bloc de 155 lignes, contentant 24 messages
 
     buf = []
-    if block != []:
+    if block:
         first_line = block[0].text
         line1 = first_line[first_line.index(" '"):]
 
@@ -79,6 +79,8 @@ def main(i_file=default_file):
     print()
     AA.cat()
 
+    input("..... ")
+
     title("Retirer les marques de bloc, faire résumé en une ligne")
     AA.select_all_begin_end_block("Task start", "****", mark_block=False, block_action=summary_of_block)
     AA.cat()
@@ -99,12 +101,11 @@ def main(i_file=default_file):
 
 
 if __name__ == '__main__':
-    # main()
-# BOUCLE
-    lst_fichiers_a_traiter  = sorted(glob.glob("./data_in/glims*.log"))
-    pprint(lst_fichiers_a_traiter)
-
-    for file in lst_fichiers_a_traiter:
-        main(file)
-        input("Key to continue...")
-
+    main()
+# # BOUCLE
+#     lst_fichiers_a_traiter  = sorted(glob.glob("./data_in/glims*.log"))
+#     pprint(lst_fichiers_a_traiter)
+#
+#     for file in lst_fichiers_a_traiter:
+#         main(file)
+#         input("Key to continue...")
