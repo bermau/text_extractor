@@ -1,9 +1,5 @@
 # Utilisation : Quel sont les commandes productives ?
-# A quoi sert la commande 106 '106 - CR_LABO_Complet_EXTERNE'
-# elle ne semble pas produire de PDF stockés... mais elle est sans doute à l'origine des impressions directes
-#  '105 - CR_LABO_Complet'                0 production de pdf
-#  '106 - CR_LABO_Complet_EXTERNE'        0 production de pdf
-# '110 - CR_Microbio_Complet'   qui sebme totalement abandonné
+# Etude de '696 - Liste de travail  CHUCLFD' sur cront5
 import os.path
 import sys
 import lib_logstudy
@@ -20,7 +16,7 @@ import glob
 sys.path.append("../HI_31_outils_divers")
 from lib_bm_utils import readkey, title
 
-default_file = r"./data_in/glimscron4_20220830_221610.log"
+default_file = r"./data_in/glimscron5_20220915_092824.log"
 
 
 def action_on_main_block(block):
@@ -80,7 +76,7 @@ def main(i_file=default_file):
     # events at 15 PM :
     # AA.select_all_begin_end_block(r"Task start:.*15:\d\d:\d\d", "Task end",
     #
-    AA.select_all_begin_end_block(r"Task.* '110 - CR", "Task end",
+    AA.select_all_begin_end_block(r"Task.* '696 - Liste", "Task end",
                                   # mark_block=False,
                                   block_action=action_on_main_block
                                   )
