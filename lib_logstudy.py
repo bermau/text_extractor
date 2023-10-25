@@ -92,6 +92,9 @@ class TextManipulator:
                 print("Création par liste de liste")
             # Liste de liste Cette parti est mal écrite mais elle est utilisée.
                 self.n_lines = [ NumberedLine(val_num, val_text) for val_num, val_text in input_source ]
+            elif isinstance(input_source[0], str):
+                print("Création par liste de str")
+                self.n_lines = [ NumberedLine(i, val_text) for i, val_text in enumerate(input_source)]
 
     def loadString(self, string):
         """"A string containing
@@ -133,13 +136,16 @@ class TextManipulator:
     def select_regex(self, pattern, skip=0):  # Tested
         """Ne conserve que les lignes avec une RegEx."""
         p = re.compile(pattern)
-        # avecPat = [line for line in self.lines if p.match(line)]
         with_pattern = [line for line in self.n_lines[skip:] if p.match(line.text)]
         self.n_lines = with_pattern
 
     def get_regex(self, pattern, skip=0):
         """retourne les lignes contenant une regex (sans toucher au n_lines)
-        returns NumberedLines"""
+
+        returns NumberedLines
+        :param pattern: regex pattern
+        :param skip: number of lines to skip
+        :return: [ NumberedLines ] """
         p = re.compile(pattern)
         with_pattern = [line for line in self.n_lines[skip:] if p.match(line.text)]
         return with_pattern
@@ -222,14 +228,23 @@ Type;Moyenne;SD;CV;Nb"""
         self.n_lines = buf
 
     def generator_for_begin_end_block(self, init_pattern, end_pattern, skip=0, before=0, after=0):  # Tested
-        """Return block, that is a list a NumberedLines"""
+        """Return block, that is a list a NumberedLines
+        support regex.
+        :param init_pattern: str (raw string) : regex pattern for the beggining of the block
+        :param end_pattern: idem for the end
+
+        :type skip: int
+        """
         compteur = skip
+        init_regex = re.compile(init_pattern)
+        end_regex = re.compile(end_pattern)
         buffer = []
         status = 0
         for line_nb, numbered_line in enumerate(self.n_lines[skip:]):
 
             if status == 1:  # un début de block a déjà été trouvé :
-                if end_pattern not in numbered_line.text:
+                # if end_pattern not in numbered_line.text:
+                if not end_regex.match(numbered_line.text):
                     buffer.append(numbered_line)
                 else:  # On a trouvé le signal de fin
                     buffer.append(numbered_line)
@@ -238,7 +253,8 @@ Type;Moyenne;SD;CV;Nb"""
                     yield buffer
 
             elif status == 0:  # En cours de recherche
-                if init_pattern in numbered_line.text:
+                # if init_pattern in numbered_line.text:
+                if init_regex.match(numbered_line.text):
                     buffer = [numbered_line]
                     status = 1  # un début de block a été trouvé
 
