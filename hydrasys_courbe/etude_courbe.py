@@ -9,16 +9,18 @@ with open("data.txt", 'r') as f:
 # j'ajoute un caractère '0' en début de chaine.
 data = "0"+data
 
-def get_pairs(dat_str):
-    if len(dat_str) % 2  != 0:
+def get_groups(dat_str, by = 2):
+    if len(dat_str) % by  != 0:
         print("IMPAIR")
         dat_str += "0"
-    pairs = [dat_str[i:i+2] for i in range(0, len(dat_str), 2)]
+    pairs = [dat_str[i:i+by] for i in range(0, len(dat_str), by)]
     return pairs
 
 valeurs = []
-for i, valeur in enumerate(get_pairs(data)):
-    if i % 2 != 0 :
+
+group_by = 3
+for i, valeur in enumerate(get_groups(data, by=group_by)):
+    if i % group_by != 0 :
         decim = int(valeur, 16)
         print(decim)
         valeurs.append(decim)
