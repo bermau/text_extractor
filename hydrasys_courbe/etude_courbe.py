@@ -1,7 +1,8 @@
 # Etude des données issues du fichier / in.dat situé dans
 # /mips/messages/hhydrasys/phor_good/out.dat
 # Je note que toutes les trames commencent par 000300A01
-# Je pense avoir compris : chaque intensité est codée par 2 octets en hexcédimal, suivis de 2 octets nuls 00.
+# Je pense avoir compris : chaque intensité est codée par 2 octets en hexadécimal, suivis
+# de 2 octets nuls 00.
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -29,7 +30,6 @@ print(f"{len(valeurs)=}")
 
 x = range(len(valeurs))
 y = valeurs
-
 
 plt.plot(x,y)
 plt.show(block=True)
