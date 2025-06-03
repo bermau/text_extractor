@@ -7,24 +7,44 @@ from datetime import datetime, timedelta
 from collections import deque, defaultdict
 import matplotlib.pyplot as plt
 import glob
+from local_param import trl_rep
+import subprocess
+from pathlib import Path
 
-REP = "../data_in/dms"
+INPUT_REP = "../data_in/dms_2"
 
 FILES = [
-"DMS_dem_20250524_114214.log",
-"DMS_dem_20250525_114225.log",
-"DMS_dem_20250526_114237.log",
-"DMS_dem_20250526_173047.log",
-"DMS_dem_20250526_174551.log",
-"DMS_dem_20250527_174648.log"
+    "DMS_dem_20250524_114214.log",
+    "DMS_dem_20250525_114225.log",
+    "DMS_dem_20250526_114237.log",
+    "DMS_dem_20250526_173047.log",
+    "DMS_dem_20250526_174551.log",
+    "DMS_dem_20250527_174648.log"
 ]
 
+class Fetcher:
+    """Outils pour récupérer des fichiers"""
+    def __init__(self, repertory):
+        self.repertory = repertory
+        self.login = None
+        self.pw = None
 
-class LogViewer():
+
+    def define_session(self):
+        "Demande user/mp"
+        self.login = input("Login ?")
+        self.pw = input("Passwd ?")
+
+    def fetch_files(self):
+        pass
+        # Exemple : liste le contenu d’un répertoire
+        result = subprocess.run(["scp", "-l"], capture_output=True, text=True)
+
+
+class LogViewer:
     def __init__(self, files_lst, date_pattern=None, bloc_min=60, context_lines=2, keywords=None,
-                 start_time = None, stop_time = None):
+                 start_time=None, stop_time=None):
         """
-
         :param files_lst:
         :param date_pattern:
         :param bloc_min:             # duration of each period in minutes.
@@ -37,21 +57,18 @@ class LogViewer():
         self.context_lines = context_lines
 
         # Mots-clés à détecter
-        self.keywords= keywords
-        if self.keywords is None:
-            self.keywords= ["WARNING", "ERROR"]
+        self.keywords = keywords or ["WARNING", "ERROR"]
 
         # Dictionnaire pour compter les erreurs par tranche de N minute
         self.time_counts = {keyw: defaultdict(int) for keyw in self.keywords}
 
-        self.first_time = None     # first_time représente la première demi-heure où une erreur est détectée, pas le début du fichier log.
+        self.first_time = None  # first_time représente la première demi-heure où une erreur est détectée, pas le début du fichier log.
         self.last_time = None
-        if self.date_pattern is None:
-            self.date_pattern = r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+
+        self.date_pattern = date_pattern or r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
 
         self.start_time = start_time or datetime(2025, 5, 20, 1)  # datetime compris
         self.stop_time = stop_time or datetime(2025, 6, 30, 10)  # datetime non compris
-
 
     def examine_logs(self):
         # définit le fait d'être dans la période d'étude (entre les 2 date start_time et stop_time)
@@ -147,6 +164,11 @@ class LogViewer():
 
 
 if __name__ == '__main__':
+    fetcher = Fetcher(os.path.join(trl_rep,'valab'))
+    fetcher.define_session()
+
+
+
     # On va extraire tous les fichiers ayant un même motif.
     motif = "xn"
     files_batch = "../data_in/dms_2/" + motif + "*.log"
@@ -155,4 +177,3 @@ if __name__ == '__main__':
     C = LogViewer(FILES, bloc_min=120)
     C.examine_logs()
     C.make_graph()
-
