@@ -19,8 +19,8 @@ files = [
 "DMS_dem_20250527_174648.log"
 ]
 # On va extraire tous les fichiers ayant un même motif.
-motif = "DMS_dem"
-files_batch = "../data_in/dms/" + motif + "*.log"
+motif = "xn"
+files_batch = "../data_in/dms_2/" + motif + "*.log"
 files = glob.glob(files_batch)
 
 
@@ -29,7 +29,7 @@ context_lines = 2
 
 
 # Mots-clés à détecter
-keywords = [ "ERROR", "WARNING"]
+keywords = [ "ERROR"]
 # Durée des tranches en minutes
 block_min = 60
 
@@ -42,7 +42,7 @@ first_time = None  # first_time représente la première demi-heure où une erre
 last_time = None
 
 start_time = datetime(2025, 5, 20, 1 )    # compris
-stop_time = datetime(2025, 5, 30, 3)      # non compris
+stop_time = datetime(2025, 6, 30, 10)      # non compris
 # start_time = datetime(2025, 5, 28, 5 )    # compris
 # stop_time = datetime(2025, 5, 29 )      # non compris
 
