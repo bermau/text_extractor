@@ -6,8 +6,9 @@ import re
 from datetime import datetime, timedelta
 from collections import deque, defaultdict
 import matplotlib.pyplot as plt
+
 import glob
-from local_param import trl_rep
+import local_param
 import subprocess
 from pathlib import Path
 
@@ -22,42 +23,119 @@ FILES = [
     "DMS_dem_20250527_174648.log"
 ]
 
+
 class Fetcher:
     """Outils pour récupérer des fichiers"""
+
     def __init__(self, repertory):
         self.repertory = repertory
         self.login = None
         self.pw = None
 
-
     def define_session(self):
         "Demande user/mp"
-        self.login = input("Login ?")
-        self.pw = input("Passwd ?")
+        self.host = local_param.host
+        self.login = local_param.lg
+        self.pw = local_param.pw
 
-    def fetch_files(self):
-        pass
-        # Exemple : liste le contenu d’un répertoire
-        result = subprocess.run(["scp", "-l"], capture_output=True, text=True)
+    def recuperer_logs_scp(self, host, username, password, repertoire_distant, repertoire_local):
+        """
+        Récupère les fichiers de logs via scp
+        """
+
+        # Créer le répertoire local s'il n'existe pas
+        Path(repertoire_local).mkdir(parents=True, exist_ok=True)
+
+        # Utiliser le fichier de config SSH de l'utilisateur
+        ssh_config = os.path.expanduser("~/AppData/Roaming/MobaXterm/home/.ssh/config")
+
+        print(f"Utiliser {ssh_config=}")
+
+        known_hosts_path = r"C:\Users\U178211\AppData\Roaming\MobaXterm\home\.ssh\known_hosts"
+        # Commande scp pour récupérer tous les fichiers du répertoire REP
+        commande = [
+            "scp",
+            "-o", f"UserKnownHostsFile={known_hosts_path}",
+            "-o", "HostKeyAlgorithms=+ssh-rsa,ssh-dss",
+            "-o", "PubkeyAcceptedKeyTypes=+ssh-rsa,ssh-dss",
+            "-F", ssh_config,  # utiliser la config SSH
+            "-r",  # récursif
+            f"{username}@{host}:{repertoire_distant}/*",
+            repertoire_local
+        ]
+
+        try:
+            # Utiliser Popen pour pouvoir envoyer le mot de passe
+            process = subprocess.Popen(
+                commande,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+
+            # Envoyer le mot de passe si demandé
+            stdout, stderr = process.communicate(input=f"{password}\n")
+
+            if process.returncode == 0:
+                print("Téléchargement réussi !")
+                return True
+            else:
+                print(f"Erreur scp : {stderr}")
+                return False
+
+        except Exception as e:
+            print(f"Erreur lors de l'exécution : {e}")
+            return False
+
+
+class BlockManipulator:
+    """Manip sur un bloc de N lignes"""
+
+    def __init__(self, nb):
+        self.buffer = deque(maxlen=nb)
+        for _ in range(nb):
+            self.buffer.append("None")
+        self.date_match = False
+
+    def append(self, qqchose):
+        self.buffer.append(qqchose)
+
+    def if_date_and_context_match(self, date_pattern, txt_pattern):
+        """
+        Test si la ligne du milieu contient une date est les lignes du centre contiennent des mots clés
+        :param date_pattern:
+        :param txt_pattern:  list of pattern mathc for pre-line, lien and post-line
+        :return:
+        """
+        self.date_match = re.search(date_pattern, self.buffer[2], re.IGNORECASE)
+        pre_condition = txt_pattern[0] in self.buffer[1]
+        post_condition = txt_pattern[2] in self.buffer[3]
+        return self.date_match and pre_condition and post_condition
+
+    def afficher(self):
+        print("-----------")
+        for line in self.buffer:
+            print(line.strip())
 
 
 class LogViewer:
-    def __init__(self, files_lst, date_pattern=None, bloc_min=60, context_lines=2, keywords=None,
+    def __init__(self, files_lst, date_pattern=None, bloc_min=60, context_lines_nb=2, keywords=None, contextual_kwds=None,
                  start_time=None, stop_time=None):
         """
         :param files_lst:
         :param date_pattern:
         :param bloc_min:             # duration of each period in minutes.
-        :param context_lines:        # Nombre de lignes de contexte avant et après
+        :param context_lines_nb:        # Nombre de lignes de contexte avant et après
 
         """
         self.files = files_lst
         self.date_pattern = date_pattern
         self.block_min = bloc_min
-        self.context_lines = context_lines
+        self.context_lines_nb = context_lines_nb
 
         # Mots-clés à détecter
-        self.keywords = keywords or ["WARNING", "ERROR"]
+        self.keywords = keywords or ["ERROR", "WARNING"]
 
         # Dictionnaire pour compter les erreurs par tranche de N minute
         self.time_counts = {keyw: defaultdict(int) for keyw in self.keywords}
@@ -66,68 +144,80 @@ class LogViewer:
         self.last_time = None
 
         self.date_pattern = date_pattern or r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+        # detect_word
+        context_word = "Unreadable"
+        self.contextual_kwds = contextual_kwds or ["", "", context_word]
 
         self.start_time = start_time or datetime(2025, 5, 20, 1)  # datetime compris
         self.stop_time = stop_time or datetime(2025, 6, 30, 10)  # datetime non compris
+
+
 
     def examine_logs(self):
         # définit le fait d'être dans la période d'étude (entre les 2 date start_time et stop_time)
         study_state = 0  # 0 : avant, 1 : pendant, 2 après
 
+
+
         # Chemin vers le fichier log
         for file in self.files:
             log_file = file
-            # os.path.join(REP, file)
 
             with open(log_file, "r", encoding="ANSI") as f:
-                buffer = deque(maxlen=self.context_lines)
+                # buffer = deque(maxlen=self.context_lines_nb)
+                buffer_5 = BlockManipulator(5)
                 show_post = 0
 
                 for line in f:
-                    date_match = re.search(self.date_pattern, line, re.IGNORECASE)
-                    if date_match:
-                        log_date = datetime.strptime(date_match.group(), "%Y-%m-%d %H:%M:%S")
+
+                    if line == "\n":
+                        continue
+                    # print(f"Line : {line.strip()}")
+                    # date_match = buffer.if_date_and_context_match(self.date_pattern)
+
+                    # Retenir la ligne dans un buffer de 2 lignes (paramétrable).
+                    buffer_5.append(line)
+
+                    criteria_match = buffer_5.if_date_and_context_match(self.date_pattern, self.contextual_kwds)
+
+                    if criteria_match:
+                        log_date = datetime.strptime(buffer_5.date_match.group(), "%Y-%m-%d %H:%M:%S")
 
                         # Déterminer si on est dans la période d'étude.
-                        if study_state == 0:
+                        if study_state == 0:  # avant
                             if log_date >= self.start_time:
                                 study_state = 1
-                        elif study_state == 1:
+                        elif study_state == 1:  # pendant
                             if log_date >= self.stop_time:
-                                study_state = 2
+                                study_state = 2  # après
 
                         if study_state == 1:
                             # Regrouper les erreurs par NN minute. Arrondir à la période inférieure
                             minute_block = (log_date.minute // self.block_min) * self.block_min
-                            log_half_hour = log_date.replace(minute=minute_block, second=0)
+                            period_of_log = log_date.replace(minute=minute_block, second=0)
 
                             # repérer le début et la fin des erreurs
-                            if not self.first_time or log_half_hour < self.first_time:
-                                self.first_time = log_half_hour
-                            if not self.last_time or log_half_hour > self.last_time:
-                                self.last_time = log_half_hour
+                            if not self.first_time or period_of_log < self.first_time:
+                                self.first_time = period_of_log
+                            if not self.last_time or period_of_log > self.last_time:
+                                self.last_time = period_of_log
 
-                    # totu le reste n'a d'intérête qu'n cours d'étude
-                    if study_state == 1:
-                        # Afficher le contexte qui suit un mot clé
-                        if show_post > 0:
-                            print(line.strip())
-                            show_post -= 1
-                            continue
+                    # tout le reste n'est effectué qu'en cours d'étude
+                    if (study_state == 1) and criteria_match:
+                        # Afficher le contexte qui suit un mot clé précédemment détecté
 
-                        # Reternir la ligne dans un buffer de 2 lignes (paramétrable).
-                        buffer.append(line)
-
-                        # Rechercher les mots clés et mettre à jour le dictionnaire compteur de mots.
+                        # # Ajout d'un filtre : il faut un mot-clé dans la ligne pré contexte
+                        # # Rechercher les mots clés et mettre à jour le dictionnaire compteur de mots.
                         for keyword in self.keywords:
-                            if keyword in line and date_match:
-                                self.time_counts[keyword][log_half_hour] += 1
+                            if keyword in line and criteria_match:
+                                self.time_counts[keyword][period_of_log] += 1
+                                buffer_5.afficher()
 
-                                # Afficher le buffer (qui contient la ligne actuelle et la précédente)
-                                print("------")
-                                for ctx_line in buffer:
-                                    print(ctx_line.strip())
-                                show_post = self.context_lines
+                        #         # Afficher le buffer (qui contient la ligne précédente et la ligne actuelle)
+                        #         print("------")
+                        #         for ctx_line in buffer:
+                        #             print(ctx_line.strip())
+                        #         show_post = self.context_lines_nb
 
     def make_graph(self):
         # Générer un graphique
@@ -151,29 +241,46 @@ class LogViewer:
                 counts = [self.time_counts[kw][t] for t in full_range]
                 plt.plot(full_range, counts, marker='o', label=kw)
 
-            plt.title(f"Nombre d'erreurs par {self.block_min} minutes (Fichiers : {motif})")
+            plt.title(f"""Nombre d'erreurs par {self.block_min} minutes (Fichiers : {motif} {self.keywords}, )
+contexte : {self.contextual_kwds}""")
             plt.xlabel("Temps")
             plt.ylabel("Nombre d'erreurs")
             plt.grid(True)
             plt.legend()
             plt.xticks(rotation=45)
             plt.tight_layout()
-            plt.show()
+
+            plt.show(block=True)
         else:
             print("Aucune erreur détectée pour générer un graphique.")
 
 
 if __name__ == '__main__':
-    fetcher = Fetcher(os.path.join(trl_rep,'valab'))
-    fetcher.define_session()
+    # fetcher = Fetcher(os.path.join(trl_rep,'valab'))
+    # fetcher.define_session()
+    #
+    # rep_distant= os.path.join(trl_rep, "valab")
+    # print(f"{rep_distant=}")
+    #
+    # fetcher.recuperer_logs_scp(fetcher.host, fetcher.login,
+    #                            fetcher.pw,
+    #                            repertoire_distant= os.path.join(trl_rep, "valab"),
+    #                            repertoire_local=INPUT_REP)
 
+    # # On va extraire tous les fichiers ayant un même motif.
+    motif = "glimsonl20"
+    kw = ["WARNING"]
 
-
-    # On va extraire tous les fichiers ayant un même motif.
-    motif = "xn"
     files_batch = "../data_in/dms_2/" + motif + "*.log"
     FILES = glob.glob(files_batch)
 
-    C = LogViewer(FILES, bloc_min=120)
+    C = LogViewer(FILES
+                  , bloc_min=60
+                  , keywords=kw
+                  , start_time=datetime(2025, 5, 30, 0)
+                  # , stop_time=datetime(2025, 5, 18, 0)
+                  , contextual_kwds = ["", "", "Unreadable"]
+                  )
+
     C.examine_logs()
     C.make_graph()
