@@ -93,6 +93,7 @@ class BlockManipulator:
     """Manip sur un bloc de N lignes"""
 
     def __init__(self, nb):
+        self.nb = nb
         self.buffer = deque(maxlen=nb)
         for _ in range(nb):
             self.buffer.append("None")
@@ -112,6 +113,10 @@ class BlockManipulator:
         pre_condition = txt_pattern[0] in self.buffer[1]
         post_condition = txt_pattern[2] in self.buffer[3]
         return self.date_match and pre_condition and post_condition
+
+    @property
+    def main_line(self):
+        return self.buffer[2]
 
     def afficher(self):
         print("-----------")
@@ -167,7 +172,6 @@ class LogViewer:
                 show_post = 0
 
                 for line in f:
-
                     if line == "\n":
                         continue
                     # print(f"Line : {line.strip()}")
@@ -207,7 +211,7 @@ class LogViewer:
                         # # Ajout d'un filtre : il faut un mot-clé dans la ligne pré contexte
                         # # Rechercher les mots clés et mettre à jour le dictionnaire compteur de mots.
                         for keyword in self.keywords:
-                            if keyword in line and criteria_match:
+                            if keyword in buffer_5.main_line and criteria_match:
                                 self.time_counts[keyword][period_of_log] += 1
                                 buffer_5.afficher()
 
@@ -252,7 +256,6 @@ class LogViewer:
                                                         )
                          )
 
-
             # Afficher les titres
             if title:
                 whole_title = title + "\n"
@@ -275,9 +278,9 @@ contexte : {self.contextual_kwds}
         else:
             print("Aucune erreur détectée pour générer un graphique.")
 
+
 def demo_repartation_code_barre():
-    # # On va extraire tous les fichiers ayant un même motif.
-    # global motif
+    # Etude du dysfonctionnement du moteur du lecteur de codes-barres.
 
     motif = "glimsonl20"
     kw = ["WARNING"]
@@ -289,31 +292,48 @@ def demo_repartation_code_barre():
     files_batch = "../data_in/dms_2/" + motif + "*.log"
     FILES = glob.glob(files_batch)
 
+    C = LogViewer(FILES, bloc_min=60, keywords=kw, motif = motif, contextual_kwds=["", "", "Unreadable"])
+    C.examine_logs()
+    C.make_graph(title="Recherche des erreurs de codes-barres", annotations=annotations)
+
+def demo_recherche_arret_DMS():
+    # # On va extraire tous les fichiers ayant un même motif.
+    # global motif
+
+    motif = "DMS_dem"
+    kw =["ERROR"]
+
+    annotations = None
+
+    files_batch = "../data_in/dms_2/" + motif + "*.log"
+    FILES = glob.glob(files_batch)
+
     C = LogViewer(FILES
                   , bloc_min=60
                   , keywords=kw
-                  # , start_time=datetime(2025, 6, 4, 0)
+                  , start_time=datetime(2025, 5, 9, 0)
                   # , stop_time=datetime(2025, 6, 6, 0)
                   , motif = motif
-                  , contextual_kwds=["", "", "Unreadable"]
+                  , contextual_kwds=["", "", ""]
                   )
 
     C.examine_logs()
+    C.make_graph(title="Recherche arrêt DMS", annotations=annotations)
 
-    C.make_graph(title="Recherche des erreurs de codes-barres", annotations=annotations)
+def demo_recup_logs():
+    trl_rep = "../data_in/dms_2/"
+    fetcher = Fetcher(os.path.join(trl_rep,'valab'))
+    fetcher.define_session()
 
+    rep_distant= os.path.join(trl_rep, "valab")
+    print(f"{rep_distant=}")
+
+    fetcher.recuperer_logs_scp(fetcher.host, fetcher.login,
+                               fetcher.pw,
+                               repertoire_distant= os.path.join(trl_rep, "valab"),
+                               repertoire_local=INPUT_REP)
 
 if __name__ == '__main__':
-    # fetcher = Fetcher(os.path.join(trl_rep,'valab'))
-    # fetcher.define_session()
-    #
-    # rep_distant= os.path.join(trl_rep, "valab")
-    # print(f"{rep_distant=}")
-    #
-    # fetcher.recuperer_logs_scp(fetcher.host, fetcher.login,
-    #                            fetcher.pw,
-    #                            repertoire_distant= os.path.join(trl_rep, "valab"),
-    #                            repertoire_local=INPUT_REP)
 
-    demo_repartation_code_barre()
+    demo_recherche_arret_DMS()
 
