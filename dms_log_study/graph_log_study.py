@@ -120,7 +120,8 @@ class BlockManipulator:
 
 
 class LogViewer:
-    def __init__(self, files_lst, date_pattern=None, bloc_min=60, context_lines_nb=2, keywords=None, contextual_kwds=None,
+    def __init__(self, files_lst, date_pattern=None, bloc_min=60, context_lines_nb=2, keywords=None,
+                 contextual_kwds=None,
                  start_time=None, stop_time=None):
         """
         :param files_lst:
@@ -151,13 +152,9 @@ class LogViewer:
         self.start_time = start_time or datetime(2025, 5, 20, 1)  # datetime compris
         self.stop_time = stop_time or datetime(2025, 6, 30, 10)  # datetime non compris
 
-
-
     def examine_logs(self):
         # définit le fait d'être dans la période d'étude (entre les 2 date start_time et stop_time)
         study_state = 0  # 0 : avant, 1 : pendant, 2 après
-
-
 
         # Chemin vers le fichier log
         for file in self.files:
@@ -213,13 +210,9 @@ class LogViewer:
                                 self.time_counts[keyword][period_of_log] += 1
                                 buffer_5.afficher()
 
-                        #         # Afficher le buffer (qui contient la ligne précédente et la ligne actuelle)
-                        #         print("------")
-                        #         for ctx_line in buffer:
-                        #             print(ctx_line.strip())
-                        #         show_post = self.context_lines_nb
 
-    def make_graph(self):
+    def make_graph(self, title=None, annotations=None):
+
         # Générer un graphique
         if any(self.time_counts[k] for k in self.keywords):
 
@@ -236,13 +229,40 @@ class LogViewer:
 
             full_range.sort()
 
-            plt.figure(figsize=(12, 5))
+            # plt.figure(figsize=(12, 5))
+            fig, ax1 = plt.subplots(figsize=(12, 5))
+
             for kw in self.keywords:
                 counts = [self.time_counts[kw][t] for t in full_range]
                 plt.plot(full_range, counts, marker='o', label=kw)
 
-            plt.title(f"""Nombre d'erreurs par {self.block_min} minutes (Fichiers : {motif} {self.keywords}, )
-contexte : {self.contextual_kwds}""")
+            # Afficher les annotations
+            if annotations:
+                for i, (la_date, label) in enumerate(annotations, start=1):
+                    if (la_date >= full_range[0]) and (la_date <= full_range[-1]):
+                         ax1.annotate(label, xy=(la_date, 10*i)
+                                      , rotation=0
+                                      , ha= 'left'
+                                      , va = 'bottom'
+                                      # , arrowprops=dict(facecolor='black',  arrowstyle="simple", connectionstyle="arc3,rad=-0.2")
+                                      , arrowprops=dict(facecolor='black', arrowstyle="->"
+                                                        # connectionstyle="angle3,angleA=0,angleB=90"
+                                                        ,shrinkA=0, shrinkB=0
+                                                        )
+                         )
+
+
+            # Afficher les titres
+            if title:
+                whole_title = title + "\n"
+            else:
+                whole_title = ""
+            whole_title += f"""
+Nombre d'erreurs par {self.block_min} minutes (Fichiers : {motif} {self.keywords}, )
+contexte : {self.contextual_kwds}
+"""
+
+            plt.title(whole_title)
             plt.xlabel("Temps")
             plt.ylabel("Nombre d'erreurs")
             plt.grid(True)
@@ -271,16 +291,21 @@ if __name__ == '__main__':
     motif = "glimsonl20"
     kw = ["WARNING"]
 
+    annotations = [(datetime(2025, 6, 4 , 18), "Orientation privilégiée des tubes")
+                 , (datetime(2025, 6, 5, 14), "Intervention sur lecteur de code-barres")
+                   ]
+
     files_batch = "../data_in/dms_2/" + motif + "*.log"
     FILES = glob.glob(files_batch)
 
     C = LogViewer(FILES
                   , bloc_min=60
                   , keywords=kw
-                  , start_time=datetime(2025, 5, 30, 0)
-                  # , stop_time=datetime(2025, 5, 18, 0)
-                  , contextual_kwds = ["", "", "Unreadable"]
+                  # , start_time=datetime(2025, 6, 4, 0)
+                  # , stop_time=datetime(2025, 6, 6, 0)
+                  , contextual_kwds=["", "", "Unreadable"]
                   )
 
     C.examine_logs()
-    C.make_graph()
+
+    C.make_graph(title="Recherche des erreurs de codes-barres", annotations=annotations)
