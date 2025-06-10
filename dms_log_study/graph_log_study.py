@@ -120,7 +120,7 @@ class BlockManipulator:
 
 
 class LogViewer:
-    def __init__(self, files_lst, date_pattern=None, bloc_min=60, context_lines_nb=2, keywords=None,
+    def __init__(self, files_lst, date_pattern=None, bloc_min=60, context_lines_nb=2, motif=None, keywords=None,
                  contextual_kwds=None,
                  start_time=None, stop_time=None):
         """
@@ -136,6 +136,7 @@ class LogViewer:
         self.context_lines_nb = context_lines_nb
 
         # Mots-clés à détecter
+        self.motif= motif
         self.keywords = keywords or ["ERROR", "WARNING"]
 
         # Dictionnaire pour compter les erreurs par tranche de N minute
@@ -258,7 +259,7 @@ class LogViewer:
             else:
                 whole_title = ""
             whole_title += f"""
-Nombre d'erreurs par {self.block_min} minutes (Fichiers : {motif} {self.keywords}, )
+Nombre d'erreurs par {self.block_min} minutes (Fichiers : {self.motif} {self.keywords}, )
 contexte : {self.contextual_kwds}
 """
 
@@ -274,6 +275,33 @@ contexte : {self.contextual_kwds}
         else:
             print("Aucune erreur détectée pour générer un graphique.")
 
+def demo_repartation_code_barre():
+    # # On va extraire tous les fichiers ayant un même motif.
+    # global motif
+
+    motif = "glimsonl20"
+    kw = ["WARNING"]
+
+    annotations = [(datetime(2025, 6, 4, 18), "Orientation privilégiée des tubes")
+        , (datetime(2025, 6, 5, 14), "Intervention sur lecteur de code-barres")
+                   ]
+
+    files_batch = "../data_in/dms_2/" + motif + "*.log"
+    FILES = glob.glob(files_batch)
+
+    C = LogViewer(FILES
+                  , bloc_min=60
+                  , keywords=kw
+                  # , start_time=datetime(2025, 6, 4, 0)
+                  # , stop_time=datetime(2025, 6, 6, 0)
+                  , motif = motif
+                  , contextual_kwds=["", "", "Unreadable"]
+                  )
+
+    C.examine_logs()
+
+    C.make_graph(title="Recherche des erreurs de codes-barres", annotations=annotations)
+
 
 if __name__ == '__main__':
     # fetcher = Fetcher(os.path.join(trl_rep,'valab'))
@@ -287,25 +315,5 @@ if __name__ == '__main__':
     #                            repertoire_distant= os.path.join(trl_rep, "valab"),
     #                            repertoire_local=INPUT_REP)
 
-    # # On va extraire tous les fichiers ayant un même motif.
-    motif = "glimsonl20"
-    kw = ["WARNING"]
+    demo_repartation_code_barre()
 
-    annotations = [(datetime(2025, 6, 4 , 18), "Orientation privilégiée des tubes")
-                 , (datetime(2025, 6, 5, 14), "Intervention sur lecteur de code-barres")
-                   ]
-
-    files_batch = "../data_in/dms_2/" + motif + "*.log"
-    FILES = glob.glob(files_batch)
-
-    C = LogViewer(FILES
-                  , bloc_min=60
-                  , keywords=kw
-                  # , start_time=datetime(2025, 6, 4, 0)
-                  # , stop_time=datetime(2025, 6, 6, 0)
-                  , contextual_kwds=["", "", "Unreadable"]
-                  )
-
-    C.examine_logs()
-
-    C.make_graph(title="Recherche des erreurs de codes-barres", annotations=annotations)
