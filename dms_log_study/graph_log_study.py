@@ -320,6 +320,26 @@ def demo_recherche_arret_DMS():
     C.examine_logs()
     C.make_graph(title="Recherche arrêt DMS", annotations=annotations)
 
+def demo_temoin_valab():
+
+    motif = "valab"
+    kw =["ERROR"]
+    annotations = None
+    files_batch = "../data_in/dms_2/" + motif + "*.log"
+    FILES = glob.glob(files_batch)
+
+    C = LogViewer(FILES
+                  , bloc_min=60
+                  , keywords=kw
+                  , start_time=datetime(2025, 5, 9, 0)
+                  # , stop_time=datetime(2025, 6, 6, 0)
+                  , motif = motif
+                  , contextual_kwds=["", "", ""]
+                  )
+
+    C.examine_logs()
+    C.make_graph(title="Témoin connexion valab", annotations=annotations)
+
 def demo_recup_logs():
     trl_rep = "../data_in/dms_2/"
     fetcher = Fetcher(os.path.join(trl_rep,'valab'))
@@ -335,5 +355,6 @@ def demo_recup_logs():
 
 if __name__ == '__main__':
 
-    demo_recherche_arret_DMS()
+    demo_temoin_valab()
+    # demo_recherche_arret_DMS()
 
