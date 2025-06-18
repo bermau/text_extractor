@@ -2,6 +2,7 @@
 Utilise paramiko"""
 import os
 import sys
+from pathlib import PurePosixPath
 
 import paramiko
 from scp import SCPClient
@@ -28,7 +29,7 @@ class LogImporter:
         self.current_file = None  # Fichier en cours d'importation
 
         input("Début...")
-        self.password = getpass.getpass("Mot de passe SSH : ")
+        self.password = input("Mot de passe SSH : ")
 
         # === CONNEXION SSH ===
         self.client = paramiko.SSHClient()
@@ -69,10 +70,9 @@ def demo_recup_un_fichier():
     log_importer.close_connexion()
 
 
-def import_repertory(remote_dir, local_dir):
+def import_repertory(log_importer, remote_dir, local_dir):
     """Import tout un répertoire"""
 
-    log_importer = LogImporter(hostname=hostname, port=port, username=username)
     try:
         stdin, stdout, stderr = log_importer.client.exec_command(f"sudo ls {remote_dir}")
         stdout.channel.recv_exit_status()
@@ -83,8 +83,8 @@ def import_repertory(remote_dir, local_dir):
                 remote_path = os.path.join(remote_dir, filename)
                 local_path = os.path.join(local_dir, os.path.basename(remote_path))
                 log_importer.import_file(remote_path, local_path)
-    except:
-        print("Erreur après connexion")
+    except Exception as e:
+        print(f"Erreur après connexion : {e}")
 
     finally:  # toujours exécuté, erreur ou pas
         log_importer.close_connexion()
@@ -94,8 +94,46 @@ def demo_recup_un_repertoire():
     # Importer tout un répertoire :
     remote_dir = "/mips/glims8/log/trl/scan_twain/"
     local_dir = "../data_in/dms_2"
-    import_repertory(remote_dir, local_dir)
+    log_importer = LogImporter(hostname=hostname, port=port, username=username),
+    import_repertory(log_importer, remote_dir, local_dir)
+
+def demo_recup_des_repertoires():
+    """Get all logs of a list of repertories"""
+
+    lst = ["/mips/glims8/log/trl/valab/", "/mips/glims8/log/trl/scan_twain/"]
+    local_dir = "../data_in/dms_2"
+
+    log_importer = LogImporter(hostname=hostname, port=port, username=username)
+    for rep in lst:
+        import_repertory(log_importer, rep, local_dir)
+
+    log_importer.close_connexion()
+
+
+def demo_importer_DMS():
+    print("NOUVEAU")
+    # Il y a une difficulté join fonctionne pour l'OS local...
+    trl_rep = r"/mips/glims8/log/trl"
+    lst1 = [PurePosixPath(trl_rep) / rep  for rep in [r"DMS_dem", r"DMS_res", r"DMS_tracking"]  ]
+    # os.path.join()
+    svc_rep= "/mips/glims8/log/svc"
+    lst2 = [PurePosixPath(svc_rep) / rep  for rep in ["glimsonl18", "glimsonl19", "glimsonl20"]]
+
+    lst = lst1 + lst2
+    print(lst)
+
+    local_dir = "../data_in/dms_2"
+
+    log_importer = LogImporter(hostname=hostname, port=port, username=username)
+    for rep in lst:
+        print(f"J'importe le repertoire {rep}")
+        import_repertory(log_importer, rep, local_dir)
+
+    log_importer.close_connexion()
 
 
 if __name__ == '__main__':
-    demo_recup_un_repertoire()
+    remote_dir = "/mips/glims8/log/trl/DMS_dem"
+    local_dir = "../data_in/dms_2"
+    log_importer = LogImporter(hostname=hostname, port=port, username=username),
+    import_repertory(log_importer, remote_dir, local_dir)
