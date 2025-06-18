@@ -16,9 +16,6 @@ hostname = local_param.host
 port = 22
 username = local_param.lg
 
-remote_path = "/mips/glims8/log/trl/scan_twain/scan_twain_20201109_121524.log"
-local_path = os.path.join("../data_in/dms_2", os.path.basename(remote_path))
-
 
 class LogImporter:
 
@@ -37,7 +34,7 @@ class LogImporter:
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.client.connect(hostname, port=port, username=username, password=self.password)
         self.tmp_path = f"/home/{username}/labo/temp_log.log"
-    def import_file(self, filename):
+    def import_file(self, filename, local_path):
 
         # === COPIE DU FICHIER ROOT VERS TON HOME ===
         print(f"[+] Copie du fichier root avec sudo vers {self.tmp_path}...")
@@ -52,21 +49,44 @@ class LogImporter:
         # === SUPPRESSION TEMPORAIRE (facultatif) ===
         print("[+] Suppression du fichier temporaire...")
         self.client.exec_command(f"rm {self.tmp_path}")
+        print("[✓] Fichier récupéré avec succès.")
 
+    def close_connexion(self):
         # === FERMETURE ===
         self.client.close()
-        print("[✓] Fichier récupéré avec succès.")
+        print("[✓] Cloture de la connexion.")
+
 
 def demo_recup_un_fichier():
 
-    # Exemple importer tout un répertoire
-    FILE = "/mips/glims8/log/trl/scan_twain/scan_twain_20201109_121524.log"
+    remote_path = "/mips/glims8/log/trl/scan_twain/scan_twain_20201109_121524.log"
+    local_path = os.path.join("../data_in/dms_2", os.path.basename(remote_path))
 
     # Import un fichier.
     log_importer = LogImporter(hostname=hostname, port=port, username = username)
-    log_importer.import_file(FILE)
+    log_importer.import_file(remote_path, local_path)
+    log_importer.close_connexion()
 
 if __name__ == '__main__':
 
-    demo_recup_un_fichier()
+    # Importer tout un répertoire :
+    remote_dir = "/mips/glims8/log/trl/scan_twain/"
+    local_dir =  "../data_in/dms_2"
+
+    log_importer = LogImporter(hostname=hostname, port=port, username=username)
+    stdin, stdout, stderr = log_importer.client.exec_command(f"sudo ls {remote_dir}")
+    stdout.channel.recv_exit_status()
+    files = stdout.read().decode().split()
+    # affiche les fichiers à importer.
+    print(files)
+
+    for filename in files:
+        if filename.endswith(".log"):
+            print(f"IMPORTER : {filename}")
+            remote_path = os.path.join(remote_dir, filename)
+            local_path = os.path.join("../data_in/dms_2", os.path.basename(remote_path))
+            log_importer.import_file(remote_path, local_path )
+
+    log_importer.close_connexion()
+
 
