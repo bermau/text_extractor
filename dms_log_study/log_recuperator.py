@@ -3,6 +3,7 @@ Utilise paramiko"""
 import os
 import sys
 from pathlib import PurePosixPath
+import posixpath
 
 import paramiko
 from scp import SCPClient
@@ -80,7 +81,9 @@ def import_repertory(log_importer, remote_dir, local_dir):
 
         for filename in files:
             if filename.endswith(".log"):
-                remote_path = os.path.join(remote_dir, filename)
+                # ci dessous on forece chemin type unix
+                remote_path = posixpath.join(remote_dir, filename)
+                # Ci dessous pour Windows
                 local_path = os.path.join(local_dir, os.path.basename(remote_path))
                 log_importer.import_file(remote_path, local_path)
     except Exception as e:
@@ -135,5 +138,5 @@ def demo_importer_DMS():
 if __name__ == '__main__':
     remote_dir = "/mips/glims8/log/trl/DMS_dem"
     local_dir = "../data_in/dms_2"
-    log_importer = LogImporter(hostname=hostname, port=port, username=username),
+    log_importer = LogImporter(hostname=hostname, port=port, username=username)
     import_repertory(log_importer, remote_dir, local_dir)
