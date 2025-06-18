@@ -81,24 +81,25 @@ def import_repertory(log_importer, remote_dir, local_dir):
 
         for filename in files:
             if filename.endswith(".log"):
-                # ci dessous on forece chemin type unix
+                # ci dessous on force chemin type unix
                 remote_path = posixpath.join(remote_dir, filename)
-                # Ci dessous pour Windows
-                local_path = os.path.join(local_dir, os.path.basename(remote_path))
+                # Ci-dessous pour Windows
+                local_path = os.path.join(local_dir, os.path.basename(filename))
                 log_importer.import_file(remote_path, local_path)
     except Exception as e:
         print(f"Erreur après connexion : {e}")
 
-    finally:  # toujours exécuté, erreur ou pas
-        log_importer.close_connexion()
+    # finally:  # toujours exécuté, erreur ou pas
+    #     log_importer.close_connexion()
 
 
 def demo_recup_un_repertoire():
     # Importer tout un répertoire :
     remote_dir = "/mips/glims8/log/trl/scan_twain/"
-    local_dir = "../data_in/dms_2"
+    local_dir = r"..\data_in\dms_2"
     log_importer = LogImporter(hostname=hostname, port=port, username=username),
     import_repertory(log_importer, remote_dir, local_dir)
+    log_importer.close_connexion()
 
 def demo_recup_des_repertoires():
     """Get all logs of a list of repertories"""
@@ -116,19 +117,20 @@ def demo_recup_des_repertoires():
 def demo_importer_DMS():
     print("NOUVEAU")
     # Il y a une difficulté join fonctionne pour l'OS local...
-    trl_rep = r"/mips/glims8/log/trl"
-    lst1 = [PurePosixPath(trl_rep) / rep  for rep in [r"DMS_dem", r"DMS_res", r"DMS_tracking"]  ]
+    trl_rep = "/mips/glims8/log/trl"
+    lst1 = [ posixpath.join(trl_rep, rep)  for rep in [ "DMS_tracking", "DMS_dem", "DMS_res",]  ]
     # os.path.join()
     svc_rep= "/mips/glims8/log/svc"
-    lst2 = [PurePosixPath(svc_rep) / rep  for rep in ["glimsonl18", "glimsonl19", "glimsonl20"]]
+    lst2 = [posixpath.join(svc_rep, rep)  for rep in ["glimsonl18", "glimsonl19", "glimsonl20"]]
 
     lst = lst1 + lst2
     print(lst)
 
-    local_dir = "../data_in/dms_2"
+    local_dir = r"..\data_in\dms_2"
 
     log_importer = LogImporter(hostname=hostname, port=port, username=username)
-    for rep in lst:
+
+    for i, rep in enumerate(lst):
         print(f"J'importe le repertoire {rep}")
         import_repertory(log_importer, rep, local_dir)
 
@@ -136,7 +138,4 @@ def demo_importer_DMS():
 
 
 if __name__ == '__main__':
-    remote_dir = "/mips/glims8/log/trl/DMS_dem"
-    local_dir = "../data_in/dms_2"
-    log_importer = LogImporter(hostname=hostname, port=port, username=username)
-    import_repertory(log_importer, remote_dir, local_dir)
+    demo_importer_DMS()
