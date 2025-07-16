@@ -1,4 +1,4 @@
-"""Recupterator : récupérer les logs d'un serveur localement
+"""Recuperator : récupérer les logs d'un serveur localement
 Utilise paramiko"""
 import os
 import sys
@@ -10,21 +10,17 @@ from scp import SCPClient
 import getpass
 import local_param
 
-# Dans ce programme, le login et l'hôte sont préenregistrées,
-
-# le mot de passe est demandé.
-
-# === CONFIGURATION ===
+# Dans ce programme, le login et l'hôte sont préenregistrées, le mot de passe est demandé.
 hostname = local_param.host
-port = 22
 username = local_param.lg
+port = 22
 
 
 class LogImporter:
 
     def __init__(self, hostname, port, username):
         self.password = None
-        self.hostname = hostname
+        self.hostname = hostname   # server name.
         self.port = port
         self.username = username
         self.current_file = None  # Fichier en cours d'importation
@@ -50,7 +46,7 @@ class LogImporter:
         with SCPClient(self.client.get_transport()) as scp:
             scp.get(self.tmp_path, local_path)
 
-        # === SUPPRESSION TEMPORAIRE (facultatif) ===
+        # === SUPPRESSION du TEMPORAIRE (facultatif) ===
         print("[+] Suppression du fichier temporaire...")
         self.client.exec_command(f"rm {self.tmp_path}")
         print("[✓] Fichier récupéré avec succès.")
@@ -72,7 +68,7 @@ def demo_recup_un_fichier():
 
 
 def import_repertory(log_importer, remote_dir, local_dir):
-    """Import tout un répertoire"""
+    """Importe tout un répertoire"""
 
     try:
         stdin, stdout, stderr = log_importer.client.exec_command(f"sudo ls {remote_dir}")
@@ -89,39 +85,36 @@ def import_repertory(log_importer, remote_dir, local_dir):
     except Exception as e:
         print(f"Erreur après connexion : {e}")
 
-    # finally:  # toujours exécuté, erreur ou pas
-    #     log_importer.close_connexion()
-
 
 def demo_recup_un_repertoire():
     # Importer tout un répertoire :
     remote_dir = "/mips/glims8/log/trl/scan_twain/"
-    local_dir = r"..\data_in\dms_2"
+    target_dir = r"..\data_in\dms_2"
     log_importer = LogImporter(hostname=hostname, port=port, username=username),
-    import_repertory(log_importer, remote_dir, local_dir)
+    import_repertory(log_importer, remote_dir, target_dir)
     log_importer.close_connexion()
 
 def demo_recup_des_repertoires():
     """Get all logs of a list of repertories"""
 
-    lst = ["/mips/glims8/log/trl/valab/", "/mips/glims8/log/trl/scan_twain/"]
-    local_dir = "../data_in/dms_2"
+    origins_lst = ["/mips/glims8/log/trl/valab/", "/mips/glims8/log/trl/scan_twain/"]
+    target_dir = "../data_in/dms_2"
 
     log_importer = LogImporter(hostname=hostname, port=port, username=username)
-    for rep in lst:
-        import_repertory(log_importer, rep, local_dir)
+    for rep in origins_lst:
+        import_repertory(log_importer, rep, target_dir)
 
     log_importer.close_connexion()
 
 
 def demo_importer_DMS():
-    print("NOUVEAU")
-    # Il y a une difficulté join fonctionne pour l'OS local...
+
+    # Il y a une difficulté avec join, qui fonctionne pour l'OS local...
     trl_rep = "/mips/glims8/log/trl"
-    lst1 = [ posixpath.join(trl_rep, rep)  for rep in [ "DMS_tracking", "DMS_dem", "DMS_res",]  ]
+    lst1 = [ posixpath.join(trl_rep, rep) for rep in [ "DMS_tracking", "DMS_dem", "DMS_res"]  ]
     # os.path.join()
     svc_rep= "/mips/glims8/log/svc"
-    lst2 = [posixpath.join(svc_rep, rep)  for rep in ["glimsonl18", "glimsonl19", "glimsonl20"]]
+    lst2 = [posixpath.join(svc_rep, rep) for rep in ["glimsonl18", "glimsonl19", "glimsonl20"]]
 
     lst = lst1 + lst2
     print(lst)
@@ -136,6 +129,15 @@ def demo_importer_DMS():
 
     log_importer.close_connexion()
 
+def demo_importer_cyberlab_prod():
+    lst = [ "/mips/glims8/log/trl/houl_cyberlab_PROD", "/mips/glims8/log/svc/glimsonl2" ]
+    log_importer = LogImporter(hostname=hostname, port=port, username=username)
+    local_dir = r"..\data_in\dms_2"
+
+    for i, rep in enumerate(lst):
+        print(f"J'importe le repertoire {rep}")
+        import_repertory(log_importer, rep, local_dir)
+    log_importer.close_connexion()
 
 if __name__ == '__main__':
-    demo_importer_DMS()
+    demo_importer_cyberlab_prod()
