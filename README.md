@@ -1,5 +1,5 @@
 # text_extractor
-## Python tools to study log files.
+## Python tools to study log files
 This program is in its infancy and should not be used except by its author.
 
 J'ai créé ce programme pour analyser des logs sous windows en Python. Je voulais un outil apportant des fonctionnalités 
