@@ -88,8 +88,8 @@ def import_repertory(log_importer, remote_dir, local_dir):
 
 def demo_recup_un_repertoire():
     # Importer tout un répertoire :
-    remote_dir = "/mips/glims8/log/trl/scan_twain/"
-    target_dir = r"..\data_in\dms_2"
+    remote_dir = "/mips/glims10/log/trl/ScanOrdo/"
+    target_dir = r"..\data_in\scanordo"
     log_importer = LogImporter(hostname=hostname, port=port, username=username),
     import_repertory(log_importer, remote_dir, target_dir)
     log_importer.close_connexion()
@@ -140,4 +140,4 @@ def demo_importer_cyberlab_prod():
     log_importer.close_connexion()
 
 if __name__ == '__main__':
-    demo_importer_cyberlab_prod()
+    demo_recup_un_repertoire()
