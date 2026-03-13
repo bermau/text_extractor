@@ -23,3 +23,8 @@ depuis un PC sur Windows.
   * On peut chercher un mot dans une ligne contenant une date ainsi que l'occurrence d'un autre mot la même ligne, 
 la précédente ou la suivante. On ne peut recherche un mot s'il n'y a pas de date.
   * Pas de regex pour l'instant.
+
+# Autre piste de surveillance.
+Sur Glims on peut se contenter de réaliser nu `ls -lR` sur la racine du répertoires des log. 
+On obtient ainsi la liste de tous les logs de façon récurssive. L'exament de la date de modification permet de savoir si le service ou le traducteur tourne.
+[tools](tools) contient mes essais de script pour cela; 
