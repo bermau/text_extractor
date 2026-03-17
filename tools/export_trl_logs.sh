@@ -11,6 +11,6 @@ FICHIER_SORTIE="/mips/messages/tempo_bma/tous_les_log.txt"
 cd "$REP_LOG" || exit 1
 
 # lister récursivement et enregistrer
-ls -lR > "$FICHIER_SORTIE"
+ls -ltR | grep -v '^d' | grep -v '^total' > "$FICHIER_SORTIE"
 
 echo "Liste sauvegardée dans $FICHIER_SORTIE"
