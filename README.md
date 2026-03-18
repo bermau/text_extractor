@@ -25,6 +25,7 @@ la précédente ou la suivante. On ne peut recherche un mot s'il n'y a pas de da
   * Pas de regex pour l'instant.
 
 # Autre piste de surveillance.
-Sur Glims on peut se contenter de réaliser nu `ls -lR` sur la racine du répertoires des log. 
-On obtient ainsi la liste de tous les logs de façon récurssive. L'exament de la date de modification permet de savoir si le service ou le traducteur tourne.
-[tools](tools) contient mes essais de script pour cela; 
+Sur le serveur de Glims, on peut se contenter de réaliser un `ls -ltR` sur la racine du répertoire des logs. 
+On obtient ainsi la liste de tous les logs de façon récursive. L'examen de la date de modification permet de savoir si le service ou le traducteur tourne.
+J'ai commencé [glims_log_symplify.ipynb](glims_log_symplify.ipynb), un Jnb pour exploiter ces fichiers et les présenter simplement. 
+Il reste à améliorer la présention du fichier. 
